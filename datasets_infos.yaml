@@ -1,0 +1,34 @@
+pb2007:
+  wav_pathname: ./external/raw_datasets/pb2007/_wav16/*.wav
+  ema_pathname: ./external/raw_datasets/pb2007/_seq/*.seq
+  ema_format: seq
+  ema_sampling_rate: 100
+  ema_scaling_factor: 0.1
+  ema_coils_order: [0, 6, 1, 7, 2, 8, 3, 9, 5, 11, 4, 10]
+  ema_needs_lowpass: false
+  lab_pathname: ./external/raw_datasets/pb2007/_lab/*.lab
+  lab_resolution: 10000000
+
+fsew0:
+  wav_pathname: ./external/raw_datasets/fsew0/*.wav
+  ema_pathname: ./external/raw_datasets/fsew0/*.ema
+  ema_format: est
+  ema_sampling_rate: 500
+  ema_scaling_factor: 100
+  ema_coils_order: [1, 6, 4, 9, 10, 15, 11, 16, 3, 8, 2, 7, 12, 17]
+  ema_needs_lowpass: true
+  lab_pathname: ./external/raw_datasets/fsew0/*.lab
+  lab_resolution: 1
+  phones_infos: mocha
+
+msak0:
+  wav_pathname: ./external/raw_datasets/msak0/*.wav
+  ema_pathname: ./external/raw_datasets/msak0/*.ema
+  ema_format: est
+  ema_sampling_rate: 500
+  ema_scaling_factor: 100
+  ema_coils_order: [1, 6, 4, 9, 10, 15, 11, 16, 3, 8, 2, 7, 12, 17]
+  ema_needs_lowpass: true
+  lab_pathname: ./external/raw_datasets/msak0/*.lab
+  lab_resolution: 1
+  phones_infos: mocha

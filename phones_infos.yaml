@@ -1,0 +1,112 @@
+pb2007:
+  vowels: [a, e^, e, i, y, u, o, o^, x, x^, a~, e~, x~, o~, q]
+  consonants: [p, f, b, v, m, t, s, d, z, n, k, s^, g, z^, r, l, w, h, j]
+  consonant_groups:
+    manner:
+      - [p, f, b, v, m]
+      - [t, s, d, z, n]
+      - [k, s^, g, z^, r]
+    place:
+      - [p, t, k]
+      - [f, s, s^]
+      - [b, d, g]
+      - [v, z, z^]
+  notation:
+    y: y
+    e^: ɛ
+    e~: ɛ̃
+    a: a
+    x^: ə
+    x: ø
+    u: u
+    a~: ɑ̃
+    o: o
+    q: q
+    o^: o
+    e: e
+    x~: ɛ̃
+    i: i
+    o~: ɔ̃
+    h: y
+    k: k
+    t: t
+    p: p
+    w: w
+    j: j
+    f: f
+    s: s
+    s^: ʃ
+    b: b
+    m: m
+    n: n
+    v: v
+    z: z
+    l: l
+    g: g
+    d: d
+    r: ʁ
+    z^: ʒ
+
+mocha:
+  vowels:
+    [
+      i,
+      "@",
+      ii,
+      iy,
+      uh,
+      oo,
+      ei,
+      ou,
+      "@@",
+      uu,
+      ai,
+      aa,
+      o,
+      e,
+      y,
+      ow,
+      a,
+      i@,
+      u,
+      oi,
+    ]
+  consonants:
+    [
+      p,
+      f,
+      b,
+      v,
+      m,
+      t,
+      s,
+      d,
+      z,
+      n,
+      k,
+      sh,
+      g,
+      jh,
+      r,
+      l,
+      w,
+      h,
+      dh,
+      th,
+      ch,
+      ng,
+      zh,
+      # eir,
+    ]
+  consonant_groups:
+    manner:
+      - [b, p, f, v, m]
+      - [d, dh, jh, t, s, th, z, n]
+      - [g, ng, k, sh, ch, zh, r]
+    place:
+      - [b, d, dh, jh, g, ng]
+      - [p, t, k]
+      - [f, s, th, sh, ch]
+      - [v, z, zh]
+      - [m, n, r]
+  notation: {}

@@ -1,0 +1,17 @@
+model:
+  hidden_layers: [256, 256, 256, 256]
+  activation: relu
+  batch_norm: true
+  dropout_p: 0.25
+dataset:
+  name: msak0
+  art_type: art_params
+  sound_type: cepstrum
+  datasplits_size: [80, 20, 0] # train/validation/test in percentage
+  batch_size: 8
+  num_workers: 6
+  shuffle_between_epochs: true
+training:
+  learning_rate: 0.001
+  max_epochs: 500
+  patience: 25
