@@ -3,6 +3,7 @@ import pickle
 import yaml
 from sklearn.preprocessing import StandardScaler
 
+from lib import utils
 from lib.art_sound_dataloader import get_dataloaders
 from lib.dataset_wrapper import Dataset
 from lib.nn.feedforward import FeedForward
@@ -58,15 +59,7 @@ class Synthesizer:
         return loss_fn
 
     def get_signature(self):
-        signature = "-".join(
-            (
-                f"dn={self.config['dataset']['name']}",
-                f"hl={','.join([str(i) for i in self.config['model']['hidden_layers']])}",
-                f"in={self.config['dataset']['art_type']}",
-                f"out={self.config['dataset']['sound_type']}",
-            )
-        )
-        return signature
+        return utils.get_variable_signature(self.config)
 
     def save(self, save_path):
         with open(save_path + "/config.yaml", "w") as f:

@@ -4,10 +4,11 @@ model:
   batch_norm: true
   dropout_p: 0.25
 dataset:
-  name: msak0
+  name: pb2007
   art_type: art_params
   sound_type: cepstrum
   datasplits_size: [80, 20, 0] # train/validation/test in percentage
+  datasplit_seed: null
   batch_size: 8
   num_workers: 6
   shuffle_between_epochs: true

@@ -108,8 +108,10 @@ def parse_item_name(filepath):
     return RE_ITEM_NAME.findall(filepath)[0]
 
 
-def shuffle_and_split(items, splits_size):
+def shuffle_and_split(items, splits_size, seed=None):
     items = items.copy()
+    if seed is not None:
+        random.seed(seed)
     random.shuffle(items)
     items_len = len(items)
 

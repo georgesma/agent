@@ -52,7 +52,7 @@ def get_dataloaders(dataset_config, art_scaler, sound_scaler):
     sound_data = dataset.get_items_data(dataset_config["sound_type"], cut_silences=True)
     items_name = list(sound_data.keys())
 
-    datasplits = utils.shuffle_and_split(items_name, dataset_config["datasplits_size"])
+    datasplits = utils.shuffle_and_split(items_name, dataset_config["datasplits_size"], dataset_config["datasplit_seed"])
     dataloaders = []
 
     for i_datasplit, split_items in enumerate(datasplits):
