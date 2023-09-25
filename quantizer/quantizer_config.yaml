@@ -1,0 +1,22 @@
+model:
+  hidden_dims: [256, 256, 256, 256]
+  activation: relu
+  dropout_p: 0.25
+  batch_norm: true
+  frame_padding: 2
+  num_embeddings: 64
+  embedding_dim: 32
+  commitment_cost: .25
+  use_speaker_id: true
+dataset:
+  names: [pb2007]
+  data_type: cepstrum
+  datasplits_size: [64, 16, 20] # train/validation/test in percentage
+  batch_size: 8
+  num_workers: 6
+  shuffle_between_epochs: true
+training:
+  learning_rate: 0.001
+  max_epochs: 500
+  patience: 25
+  jerk_loss_weight: 1
