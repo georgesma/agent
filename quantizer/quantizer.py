@@ -1,4 +1,5 @@
 import torch
+import torch.nn.functional as F
 import pickle
 import yaml
 from sklearn.preprocessing import StandardScaler
@@ -94,13 +95,68 @@ class Quantizer:
 
         return quantizer
 
-    # def synthesize(self, art_seq):
-    #     nn_input = torch.FloatTensor(self.art_scaler.transform(art_seq)).to("cuda")
-    #     with torch.no_grad():
-    #         nn_output = self.nn(nn_input).cpu().numpy()
-    #     sound_seq_pred = self.data_scaler.inverse_transform(nn_output)
-    #     return sound_seq_pred
+    def autoencode(self, data_seq, speaker_id):
+        nn_input = torch.FloatTensor(self.data_scaler.transform(data_seq)).to("cuda")[
+            None, :, :
+        ]
+        data_seq_len = len(data_seq)
+        speaker_id = (
+            F.one_hot(torch.tensor(speaker_id), num_classes=self.nb_speakers)[None, :]
+            .to(torch.float32)
+            .repeat(data_seq_len, 1)
+            .to("cuda")[None, :, :]
+        )
+        with torch.no_grad():
+            seqs_pred, _, quantized_latent, quantized_index, encoder_output = self.nn(
+                nn_input, speaker_id
+            )
+        autoencoded_features = {
+            "seqs_pred": self.data_scaler.inverse_transform(seqs_pred[0].cpu().numpy()),
+            "quantized_latent": quantized_latent[0].cpu().numpy(),
+            "quantized_index": quantized_index.cpu().numpy(),
+            "encoder_output": encoder_output[0].cpu().numpy(),
+        }
+        return autoencoded_features
 
-    # def synthesize_cuda(self, art_seqs):
-    #     with torch.no_grad():
-    #         return self.nn(art_seqs)
+    def get_datasplit_lab(self, datasplit_index=None):
+        datasplit_lab = {}
+
+        for dataset_name in self.config["dataset"]["names"]:
+            dataset = Dataset(dataset_name)
+
+            if datasplit_index is None:
+                dataset_lab = dataset.lab
+            else:
+                dataset_split = self.datasplits[dataset_name][datasplit_index]
+                dataset_lab = {
+                    item_name: dataset.lab[item_name] for item_name in dataset_split
+                }
+
+            datasplit_lab[dataset_name] = dataset_lab
+
+        return datasplit_lab
+
+    def autoencode_datasplit(self, datasplit_index=None):
+        quantizer_features = {}
+        data_type = self.config["dataset"]["data_type"]
+
+        for dataset_i, dataset_name in enumerate(self.config["dataset"]["names"]):
+            dataset_features = {}
+
+            dataset = Dataset(dataset_name)
+            if datasplit_index is None:
+                items_name = dataset.get_items_name(data_type)
+            else:
+                items_name = self.datasplits[dataset_name][datasplit_index]
+
+            items_data = dataset.get_items_data(self.config["dataset"]["data_type"])
+            for item_name in items_name:
+                item_data = items_data[item_name]
+                autoencoded = self.autoencode(item_data, dataset_i)
+                for autoencoded_type, autoencoded in autoencoded.items():
+                    if autoencoded_type not in dataset_features:
+                        dataset_features[autoencoded_type] = {}
+                    dataset_features[autoencoded_type][item_name] = autoencoded
+
+            quantizer_features[dataset_name] = dataset_features
+        return quantizer_features
