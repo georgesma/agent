@@ -9,6 +9,18 @@ pb2007:
   lab_pathname: ./external/raw_datasets/pb2007/_lab/*.lab
   lab_resolution: 10000000
 
+th2016:
+  wav_pathname: ./external/raw_datasets/th2016/wav16/*.wav
+  lab_pathname: ./external/raw_datasets/th2016/lab/*.lab
+  lab_resolution: 10000000
+  phones_infos: pb2007
+
+gb2016:
+  wav_pathname: ./external/raw_datasets/gb2016/wav16/*.wav
+  lab_pathname: ./external/raw_datasets/gb2016/lab/*.lab
+  lab_resolution: 10000000
+  phones_infos: pb2007
+
 fsew0:
   wav_pathname: ./external/raw_datasets/fsew0/*.wav
   ema_pathname: ./external/raw_datasets/fsew0/*.ema

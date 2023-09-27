@@ -147,45 +147,47 @@ def main():
     datasets_infos = utils.read_yaml_file("./datasets_infos.yaml")
 
     for dataset_name, dataset_infos in datasets_infos.items():
+        if dataset_name not in ["th2016", "gb2016"]: continue
         print("Preprocessing %s..." % dataset_name)
 
-        frames_sampling_rate = features_config["ema_sampling_rate"]
-
-        # print("Resampling WAV files...")
-        # preprocess_wav(
-        #     dataset_name,
-        #     dataset_infos["wav_pathname"],
-        #     features_config["wav_sampling_rate"],
-        # )
-        # print("Resampling WAV files done")
-
-        # print("Extracting cepstrograms and source parameters...")
-        # extract_cepstrum_and_source(dataset_name)
-        # print("Extracting cepstrograms and source parameters done")
-
-        print("Preprocessing EMA...")
-        items_ema = preprocess_ema(
+        print("Resampling WAV files...")
+        preprocess_wav(
             dataset_name,
-            dataset_infos["ema_pathname"],
-            dataset_infos["ema_format"],
-            dataset_infos["ema_sampling_rate"],
-            dataset_infos["ema_scaling_factor"],
-            dataset_infos["ema_coils_order"],
-            dataset_infos["ema_needs_lowpass"],
-            frames_sampling_rate,
+            dataset_infos["wav_pathname"],
+            features_config["wav_sampling_rate"],
         )
-        print("Preprocessing EMA done")
+        print("Resampling WAV files done")
 
-        print("Extracting articulatory model and parameters...")
-        extract_art_parameters(dataset_name, items_ema)
-        print("Extracting articulatory model and parameters done")
+        print("Extracting cepstrograms and source parameters...")
+        extract_cepstrum_and_source(dataset_name)
+        print("Extracting cepstrograms and source parameters done")
+
+        if "ema_pathname" in dataset_infos:
+            frames_sampling_rate = features_config["ema_sampling_rate"]
+
+            print("Preprocessing EMA...")
+            items_ema = preprocess_ema(
+                dataset_name,
+                dataset_infos["ema_pathname"],
+                dataset_infos["ema_format"],
+                dataset_infos["ema_sampling_rate"],
+                dataset_infos["ema_scaling_factor"],
+                dataset_infos["ema_coils_order"],
+                dataset_infos["ema_needs_lowpass"],
+                frames_sampling_rate,
+            )
+            print("Preprocessing EMA done")
+
+            print("Extracting articulatory model and parameters...")
+            extract_art_parameters(dataset_name, items_ema)
+            print("Extracting articulatory model and parameters done")
 
         print("Resampling LAB files...")
         preprocess_lab(
             dataset_name,
             dataset_infos["lab_pathname"],
             dataset_infos["lab_resolution"],
-            frames_sampling_rate,
+            100,
         )
         print("Resampling LAB files done")
 
