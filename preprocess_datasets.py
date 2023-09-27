@@ -147,7 +147,6 @@ def main():
     datasets_infos = utils.read_yaml_file("./datasets_infos.yaml")
 
     for dataset_name, dataset_infos in datasets_infos.items():
-        if dataset_name not in ["th2016", "gb2016"]: continue
         print("Preprocessing %s..." % dataset_name)
 
         print("Resampling WAV files...")
