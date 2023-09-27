@@ -25,10 +25,12 @@ class Dataset:
         self.phones_infos = utils.read_yaml_file("%s/phones_infos.yaml" % INFOS_PATH)[
             self.infos["phones_infos"] if "phones_infos" in self.infos else self.name
         ]
-        with open("%s/art_model.pickle" % self.path, "rb") as f:
-            self.art_model = pickle.load(f)
-        with open("%s/ema_limits.pickle" % self.path, "rb") as f:
-            self.ema_limits = pickle.load(f)
+
+        if os.path.isfile("%s/art_model.pickle" % self.path):
+            with open("%s/art_model.pickle" % self.path, "rb") as f:
+                self.art_model = pickle.load(f)
+            with open("%s/ema_limits.pickle" % self.path, "rb") as f:
+                self.ema_limits = pickle.load(f)
 
         self.lab = self._get_items_lab()
         self.items_transcription = self._get_items_transcription()
