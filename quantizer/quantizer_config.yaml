@@ -9,9 +9,10 @@ model:
   commitment_cost: .25
   use_speaker_id: true
 dataset:
-  names: [pb2007]
+  names: [pb2007, gb2016, th2016]
   data_type: cepstrum
   datasplits_size: [64, 16, 20] # train/validation/test in percentage
+  datasplit_seed: null
   batch_size: 8
   num_workers: 6
   shuffle_between_epochs: true
@@ -19,4 +20,3 @@ training:
   learning_rate: 0.001
   max_epochs: 500
   patience: 25
-  jerk_loss_weight: 1

@@ -116,6 +116,10 @@ def conduct_abx_test(distance, datasets_features, a_index, b_index, x_index):
     return ax_distance < bx_distance
 
 
+def get_global_score(abx_matrix):
+    return abx_matrix[0].sum() / abx_matrix[1].sum() * 100
+
+
 def get_groups_score(phones, abx_matrix, groups):
     groups_score = {}
 

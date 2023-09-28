@@ -44,19 +44,21 @@ def train_quantizer(quantizer, save_path):
 
 def train_with_hyperparameters(hyperparameters):
     quantizer_config = utils.read_yaml_file("quantizer/quantizer_config.yaml")
-    # quantizer_config["dataset"]["datasplit_seed"] = DATASPLIT_SEED
-    # quantizer_config["training"]["learning_rate"] = hyperparameters["learning_rate"]
-    # quantizer_config["model"]["dropout_p"] = hyperparameters["dropout_p"]
-    # quantizer_config["model"]["hidden_layers"] = [
-    #     int(2 ** hyperparameters["dim_hidden_layers"])
-    # ] * int(hyperparameters["nb_hidden_layers"])
+    quantizer_config["dataset"]["datasplit_seed"] = DATASPLIT_SEED
+
+    quantizer_config["training"]["learning_rate"] = hyperparameters["learning_rate"]
+    quantizer_config["model"]["dropout_p"] = hyperparameters["dropout_p"]
+    quantizer_config["model"]["commitment_cost"] = hyperparameters["commitment_cost"]
+    quantizer_config["model"]["hidden_dims"] = [
+        int(2 ** hyperparameters["dim_hidden_layers"])
+    ] * int(hyperparameters["nb_hidden_layers"])
 
     quantizer = Quantizer(quantizer_config)
     signature = quantizer.get_signature()
     save_path = "out/quantizer/%s" % (signature)
 
     metrics_record = train_quantizer(quantizer, save_path)
-    final_validation_loss = min(metrics_record["validation"]["total"])
+    final_validation_loss = min(metrics_record["validation"]["total_loss"])
     return final_validation_loss
 
 
@@ -66,6 +68,7 @@ def main():
         "dropout_p": hp.uniform("dropout_p", 0, 0.9),
         "dim_hidden_layers": hp.quniform("dim_hidden_layers", 6, 9, 1),
         "nb_hidden_layers": hp.quniform("nb_hidden_layers", 1, 4, 1),
+        "commitment_cost": hp.uniform("commitment_cost", 0.1, 2),
     }
 
     best_config = fmin(
