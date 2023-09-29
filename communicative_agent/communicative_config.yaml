@@ -9,38 +9,14 @@ model:
     num_layers: 2
     hidden_size: 32
     dropout_p: 0.25
-    bidirectional: False
-  sound_quantizer:
-    hidden_dims: [256, 256, 256, 256]
-    activation: relu
-    dropout_p: 0.25
-    batch_norm: true
-    frame_padding: 2
-    num_embeddings: 64
-    embedding_dim: 32
-    commitment_cost: .25
-    use_speaker_id: true
-  art_quantizer:
-    hidden_dims: [256, 256, 256, 256]
-    activation: relu
-    dropout_p: 0.25
-    batch_norm: true
-    frame_padding: 2
-    num_embeddings: 64
-    embedding_dim: 32
-    commitment_cost: .25
-    use_speaker_id: true
+    bidirectional: true
 synthesizer:
-  name: dn=pb2007-nd=2-hl=256,256,256,256-in=ema-out=cepstrum-0
-dataset:
-  names: [pb2007]
-  sound_type: cepstrum
-  datasplits_size: [64, 16, 20] # train/validation/test in percentage
-  batch_size: 8
-  num_workers: 6
-  shuffle_between_epochs: true
+  name: 1f5a2a3c7ba67a6133af746d4fc976af
+sound_quantizer:
+  name: 2c703da6ced1172e5a996ac08c5e127f
 training:
-  learning_rate: 0.001
+  inverse_model_learning_rate: 0.001
+  direct_model_learning_rate: 0.001
   max_epochs: 500
   patience: 25
-  jerk_loss_weight: 1
+  jerk_loss_weight: 0

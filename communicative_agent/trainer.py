@@ -39,13 +39,7 @@ class Trainer:
     def train(self):
         training_record = TrainingRecord()
         self.train_model_part(
-            training_record, self.epoch_sound_quantizer, "sound_quantizer_total_loss"
-        )
-        self.train_model_part(
             training_record, self.epoch_inverse_model, "inverse_model_repetition_error"
-        )
-        self.train_model_part(
-            training_record, self.epoch_art_quantizer, "art_quantizer_total_loss"
         )
         return training_record.record
 
@@ -76,30 +70,6 @@ class Trainer:
                 print()
 
         self.nn.load_state_dict(torch.load(self.checkpoint_path))
-
-    def epoch_sound_quantizer(self, dataloader, is_training):
-        nb_batch = len(dataloader)
-        epoch_record = EpochMetrics(nb_batch)
-
-        if not is_training:
-            self.nn.eval()
-
-        with torch.no_grad() if not is_training else nullcontext():
-            for batch in tqdm(dataloader, total=nb_batch, leave=False):
-                sound_seqs, speaker_seqs, seqs_len, seqs_mask = batch
-                sound_seqs = sound_seqs.to("cuda")
-                speaker_seqs = speaker_seqs.to("cuda")
-                seqs_mask = seqs_mask.to("cuda")
-
-                self.step_sound_quantizer(
-                    sound_seqs,
-                    speaker_seqs,
-                    seqs_mask,
-                    epoch_record,
-                    is_training=is_training,
-                )
-
-        return epoch_record
 
     def epoch_inverse_model(self, dataloader, is_training):
         nb_batch = len(dataloader)
@@ -136,60 +106,6 @@ class Trainer:
                 )
 
         return epoch_record
-
-    def epoch_art_quantizer(self, dataloader, is_training):
-        nb_batch = len(dataloader)
-        epoch_record = EpochMetrics(nb_batch)
-
-        if not is_training:
-            self.nn.eval()
-
-        with torch.no_grad() if not is_training else nullcontext():
-            for batch in tqdm(dataloader, total=nb_batch, leave=False):
-                sound_seqs, speaker_seqs, seqs_len, seqs_mask = batch
-                sound_seqs = sound_seqs.to("cuda")
-                speaker_seqs = speaker_seqs.to("cuda")
-                seqs_mask = seqs_mask.to("cuda")
-
-                self.step_art_quantizer(
-                    sound_seqs,
-                    seqs_len,
-                    speaker_seqs,
-                    seqs_mask,
-                    epoch_record,
-                    is_training=is_training,
-                )
-
-        return epoch_record
-
-    def step_sound_quantizer(
-        self, sound_seqs, speaker_seqs, seqs_mask, epoch_record, is_training
-    ):
-        if is_training:
-            self.nn.sound_quantizer.train()
-            self.nn.sound_quantizer.requires_grad_(True)
-
-        padded_sound_seqs = pad_seqs_frames(
-            sound_seqs, self.nn.sound_quantizer.frame_padding
-        )
-
-        if is_training:
-            self.optimizers["sound_quantizer"].zero_grad()
-        padded_sound_seqs_pred, vq_loss_seqs, quantized_latent_seqs, _, _ = self.nn.sound_quantizer(
-            padded_sound_seqs, speaker_seqs, pad_io=False
-        )
-        total_loss, reconstruction_error, vq_loss = self.losses_fn["vq_vae"](
-            padded_sound_seqs_pred, padded_sound_seqs, vq_loss_seqs, seqs_mask
-        )
-        if is_training:
-            total_loss.backward()
-            self.optimizers["sound_quantizer"].step()
-
-        epoch_record.add("sound_quantizer_total_loss", total_loss.item())
-        epoch_record.add(
-            "sound_quantizer_reconstruction_error", reconstruction_error.item()
-        )
-        epoch_record.add("sound_quantizer_vq_loss", vq_loss.item())
 
     def step_direct_model(
         self, sound_unit_seqs, seqs_len, seqs_mask, epoch_record, is_training
@@ -267,39 +183,3 @@ class Trainer:
             sound_unit_seqs_produced, sound_unit_seqs, seqs_mask
         )
         epoch_record.add("inverse_model_repetition_error", repetition_error.item())
-
-    def step_art_quantizer(
-        self, sound_seqs, seqs_len, speaker_seqs, seqs_mask, epoch_record, is_training
-    ):
-        if is_training:
-            self.nn.art_quantizer.train()
-
-        with torch.no_grad():
-            _, _, sound_unit_seqs, _, _ = self.nn.sound_quantizer(
-                sound_seqs, speaker_seqs
-            )
-            art_seqs = self.nn.inverse_model(sound_unit_seqs, seqs_len=seqs_len)
-
-        padded_art_seqs = pad_seqs_frames(
-            art_seqs, self.nn.sound_quantizer.frame_padding
-        )
-
-        if is_training:
-            self.optimizers["art_quantizer"].zero_grad()
-        padded_art_seqs_pred, vq_loss_seqs, quantized_latent_seqs, _, _ = self.nn.art_quantizer(
-            padded_art_seqs, speaker_seqs, pad_io=False
-        )
-        total_loss, reconstruction_error, vq_loss = self.losses_fn["vq_vae"](
-            padded_art_seqs_pred, padded_art_seqs, vq_loss_seqs, seqs_mask
-        )
-        if is_training:
-            total_loss.backward()
-            self.optimizers["art_quantizer"].step()
-
-        epoch_record.add("art_quantizer_total_loss", total_loss.item())
-        epoch_record.add(
-            "art_quantizer_reconstruction_error", reconstruction_error.item()
-        )
-        epoch_record.add("art_quantizer_vq_loss", vq_loss.item())
-
-        return quantized_latent_seqs.detach()
