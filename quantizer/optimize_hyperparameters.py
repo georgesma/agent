@@ -4,10 +4,13 @@ from hyperopt import tpe, hp, fmin
 import numpy as np
 
 from lib import utils
+from lib import abx_utils
 from quantizer import Quantizer
 from trainer import Trainer
 
 DATASPLIT_SEED = 1337
+ABX_NB_SAMPLES = 50
+QUANTIZER_ABX_DISTANCE = {"quantized_latent": {"metric": "cosine", "weight": 1}}
 
 
 def train_quantizer(quantizer, save_path):
@@ -42,6 +45,28 @@ def train_quantizer(quantizer, save_path):
     return metrics_record
 
 
+def get_quantizer_abx_score(quantizer):
+    main_dataset = quantizer.main_dataset
+    quantizer_lab = quantizer.get_datasplit_lab(2)
+    quantizer_features = quantizer.autoencode_datasplit(2)
+
+    consonants = main_dataset.phones_infos["consonants"]
+    vowels = main_dataset.phones_infos["vowels"]
+    consonants_indexes = abx_utils.get_datasets_phones_indexes(
+        quantizer_lab, consonants, vowels
+    )
+
+    abx_matrix = abx_utils.get_abx_matrix(
+        consonants,
+        consonants_indexes,
+        quantizer_features,
+        QUANTIZER_ABX_DISTANCE,
+        ABX_NB_SAMPLES,
+    )
+    global_abx_score = abx_utils.get_global_score(abx_matrix)
+    return global_abx_score
+
+
 def train_with_hyperparameters(hyperparameters):
     quantizer_config = utils.read_yaml_file("quantizer/quantizer_config.yaml")
     quantizer_config["dataset"]["datasplit_seed"] = DATASPLIT_SEED
@@ -52,14 +77,16 @@ def train_with_hyperparameters(hyperparameters):
     quantizer_config["model"]["hidden_dims"] = [
         int(2 ** hyperparameters["dim_hidden_layers"])
     ] * int(hyperparameters["nb_hidden_layers"])
+    quantizer_config["model"]["num_embeddings"] = int(2 ** hyperparameters["num_embeddings"])
+    quantizer_config["model"]["embedding_dim"] = int(2 ** hyperparameters["embedding_dim"])
 
     quantizer = Quantizer(quantizer_config)
     signature = quantizer.get_signature()
     save_path = "out/quantizer/%s" % (signature)
 
-    metrics_record = train_quantizer(quantizer, save_path)
-    final_validation_loss = min(metrics_record["validation"]["total_loss"])
-    return final_validation_loss
+    train_quantizer(quantizer, save_path)
+    abx_score = get_quantizer_abx_score(quantizer)
+    return 100 - abx_score
 
 
 def main():
@@ -69,6 +96,8 @@ def main():
         "dim_hidden_layers": hp.quniform("dim_hidden_layers", 6, 9, 1),
         "nb_hidden_layers": hp.quniform("nb_hidden_layers", 1, 4, 1),
         "commitment_cost": hp.uniform("commitment_cost", 0.1, 2),
+        "num_embeddings": hp.quniform("num_embeddings", 5, 9, 1),
+        "embedding_dim": hp.quniform("embedding_dim", 3, 7, 1),
     }
 
     best_config = fmin(
