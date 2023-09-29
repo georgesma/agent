@@ -1,12 +1,12 @@
 model:
-  hidden_dims: [256, 256, 256, 256]
+  hidden_dims: [512, 512]
   activation: relu
-  dropout_p: 0.25
+  dropout_p: 0.16
   batch_norm: true
   frame_padding: 2
-  num_embeddings: 64
-  embedding_dim: 32
-  commitment_cost: .25
+  num_embeddings: 512
+  embedding_dim: 64
+  commitment_cost: 1.7
   use_speaker_id: true
 dataset:
   names: [pb2007, gb2016, th2016]
@@ -17,6 +17,6 @@ dataset:
   num_workers: 6
   shuffle_between_epochs: true
 training:
-  learning_rate: 0.001
+  learning_rate: 0.0004
   max_epochs: 500
   patience: 25
