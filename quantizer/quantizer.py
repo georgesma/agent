@@ -42,7 +42,7 @@ class Quantizer:
 
     def get_dataloaders(self):
         datasplits, dataloaders = get_dataloaders(
-            self.config["dataset"], self.data_scaler
+            self.config["dataset"], self.data_scaler, self.datasplits
         )
         self.datasplits = datasplits
         return dataloaders

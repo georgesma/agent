@@ -46,13 +46,18 @@ class ArtSoundDataset(torch.utils.data.Dataset):
         return self.len
 
 
-def get_dataloaders(dataset_config, art_scaler, sound_scaler):
+def get_dataloaders(dataset_config, art_scaler, sound_scaler, datasplits):
     dataset = Dataset(dataset_config["name"])
     art_data = dataset.get_items_data(dataset_config["art_type"], cut_silences=True)
     sound_data = dataset.get_items_data(dataset_config["sound_type"], cut_silences=True)
     items_name = list(sound_data.keys())
 
-    datasplits = utils.shuffle_and_split(items_name, dataset_config["datasplits_size"], dataset_config["datasplit_seed"])
+    if datasplits is None:
+        datasplits = utils.shuffle_and_split(
+            items_name,
+            dataset_config["datasplits_size"],
+            dataset_config["datasplit_seed"],
+        )
     dataloaders = []
 
     for i_datasplit, split_items in enumerate(datasplits):

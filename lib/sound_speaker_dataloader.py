@@ -44,9 +44,10 @@ class SoundSpeakerDataset(torch.utils.data.Dataset):
         return self.len
 
 
-def get_dataloaders(dataset_config, sound_scaler):
+def get_dataloaders(dataset_config, sound_scaler, datasplits):
     datasets_sound_data = {}
-    datasplits = {}
+    if datasplits is None:
+        datasplits = {}
     nb_datasets = len(dataset_config["names"])
 
     for dataset_name in dataset_config["names"]:
@@ -55,12 +56,13 @@ def get_dataloaders(dataset_config, sound_scaler):
             dataset_config["sound_type"], cut_silences=True
         )
         dataset_items_name = list(dataset_sound_data.keys())
-        dataset_datasplits = utils.shuffle_and_split(
-            dataset_items_name, dataset_config["datasplits_size"]
-        )
+        if dataset_name not in datasplits:
+            dataset_datasplits = utils.shuffle_and_split(
+                dataset_items_name, dataset_config["datasplits_size"]
+            )
+            datasplits[dataset_name] = dataset_datasplits
 
         datasets_sound_data[dataset_name] = dataset_sound_data
-        datasplits[dataset_name] = dataset_datasplits
 
     dataloaders = []
 

@@ -44,9 +44,10 @@ class DataSpeakerDataset(torch.utils.data.Dataset):
         return self.len
 
 
-def get_dataloaders(dataset_config, data_scaler):
+def get_dataloaders(dataset_config, data_scaler, datasplits):
     datasets_data = {}
-    datasplits = {}
+    if datasplits is None:
+        datasplits = {}
     nb_datasets = len(dataset_config["names"])
 
     for dataset_name in dataset_config["names"]:
@@ -55,14 +56,15 @@ def get_dataloaders(dataset_config, data_scaler):
             dataset_config["data_type"], cut_silences=True
         )
         dataset_items_name = list(dataset_items_data.keys())
-        dataset_datasplits = utils.shuffle_and_split(
-            dataset_items_name,
-            dataset_config["datasplits_size"],
-            dataset_config["datasplit_seed"],
-        )
+        if dataset_name not in datasplits:
+            dataset_datasplits = utils.shuffle_and_split(
+                dataset_items_name,
+                dataset_config["datasplits_size"],
+                dataset_config["datasplit_seed"],
+            )
+            datasplits[dataset_name] = dataset_datasplits
 
         datasets_data[dataset_name] = dataset_items_data
-        datasplits[dataset_name] = dataset_datasplits
 
     dataloaders = []
 

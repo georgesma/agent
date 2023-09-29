@@ -40,7 +40,7 @@ class Synthesizer:
 
     def get_dataloaders(self):
         datasplits, dataloaders = get_dataloaders(
-            self.config["dataset"], self.art_scaler, self.sound_scaler
+            self.config["dataset"], self.art_scaler, self.sound_scaler, self.datasplits
         )
         self.datasplits = datasplits
         return dataloaders
