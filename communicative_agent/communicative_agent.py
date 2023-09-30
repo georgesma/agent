@@ -4,7 +4,7 @@ import os
 
 from lib.base_agent import BaseAgent
 from lib.nn.simple_lstm import SimpleLSTM
-from lib.nn.feedforward_with_derivatives import FeedForwardWithDerivatives
+from lib.nn.feedforward import FeedForward
 from lib.nn.loss import compute_jerk_loss
 
 from communicative_agent_nn import CommunicativeAgentNN
@@ -47,9 +47,8 @@ class CommunicativeAgent(BaseAgent):
             model_config["inverse_model"]["bidirectional"],
         )
 
-        direct_model = FeedForwardWithDerivatives(
+        direct_model = FeedForward(
             self.art_dim,
-            model_config["direct_model"]["nb_derivatives"],
             self.sound_dim,
             model_config["direct_model"]["hidden_layers"],
             model_config["direct_model"]["activation"],
