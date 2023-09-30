@@ -6,6 +6,7 @@ from lib import utils
 from quantizer import Quantizer
 from trainer import Trainer
 
+NB_TRAINING = 5
 
 def train_quantizer(quantizer, save_path):
     print("Training %s" % (save_path))
@@ -40,12 +41,13 @@ def train_quantizer(quantizer, save_path):
 
 
 def main():
-    quantizer_config = utils.read_yaml_file("quantizer/quantizer_config.yaml")
-    quantizer = Quantizer(quantizer_config)
-    signature = quantizer.get_signature()
-    save_path = "out/quantizer/%s" % (signature)
+    for i_training in range(NB_TRAINING):
+        quantizer_config = utils.read_yaml_file("quantizer/quantizer_config.yaml")
+        quantizer = Quantizer(quantizer_config)
+        signature = quantizer.get_signature()
+        save_path = "out/quantizer/%s-%s" % (signature, i_training)
 
-    train_quantizer(quantizer, save_path)
+        train_quantizer(quantizer, save_path)
 
 
 if __name__ == "__main__":

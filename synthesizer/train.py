@@ -5,8 +5,8 @@ from lib import utils
 from synthesizer import Synthesizer
 from trainer import Trainer
 
-NB_TRAINING = 1
-DATASETS_NAME = ["pb2007", "msak0", "fsew0"]
+NB_TRAINING = 5
+DATASETS_NAME = ["pb2007"]
 
 
 def main():

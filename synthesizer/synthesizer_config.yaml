@@ -1,8 +1,8 @@
 model:
-  hidden_layers: [256, 256, 256, 256]
+  hidden_layers: [512, 512, 512, 512]
   activation: relu
   batch_norm: true
-  dropout_p: 0.25
+  dropout_p: 0.05
 dataset:
   name: pb2007
   art_type: art_params
@@ -13,6 +13,6 @@ dataset:
   num_workers: 6
   shuffle_between_epochs: true
 training:
-  learning_rate: 0.001
+  learning_rate: 0.0005
   max_epochs: 500
   patience: 25
