@@ -106,6 +106,13 @@ class Dataset:
         if len(modalities) == 1:
             item_data = modalities_data[0]
         else:
+            min_modality_data_len = min(
+                (len(modality_data) for modality_data in modalities_data)
+            )
+            modalities_data = [
+                modality_data[:min_modality_data_len]
+                for modality_data in modalities_data
+            ]
             item_data = np.concatenate(modalities_data, axis=1)
 
         return item_data

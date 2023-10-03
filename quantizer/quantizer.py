@@ -145,18 +145,18 @@ class Quantizer:
 
     def autoencode_datasplit(self, datasplit_index=None):
         quantizer_features = {}
-        data_type = self.config["dataset"]["data_type"]
 
         for dataset_i, dataset_name in enumerate(self.config["dataset"]["names"]):
             dataset_features = {}
 
             dataset = Dataset(dataset_name)
             if datasplit_index is None:
-                items_name = dataset.get_items_name(data_type)
+                data_types = self.config["dataset"]["data_types"]
+                items_name = dataset.get_items_name(data_types[0])
             else:
                 items_name = self.datasplits[dataset_name][datasplit_index]
 
-            items_data = dataset.get_items_data(self.config["dataset"]["data_type"])
+            items_data = dataset.get_items_data(self.config["dataset"]["data_types"])
             for item_name in items_name:
                 item_data = items_data[item_name]
                 autoencoded = self.autoencode(item_data, dataset_i)
