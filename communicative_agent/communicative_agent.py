@@ -126,9 +126,9 @@ class CommunicativeAgent(BaseAgent):
             sound_seq_estimated_unscaled = self.nn.direct_model(
                 art_seq_estimated_unscaled
             )
-            _, art_unit_seq, _, _ = self.nn.art_quantizer.encode(
-                art_seq_estimated_unscaled
-            )
+            # _, art_unit_seq, _, _ = self.nn.art_quantizer.encode(
+            #     art_seq_estimated_unscaled
+            # )
 
         sound_seq_estimated_unscaled = sound_seq_estimated_unscaled[0].cpu().numpy()
         art_seq_estimated_unscaled = art_seq_estimated_unscaled[0].cpu().numpy()
@@ -139,7 +139,7 @@ class CommunicativeAgent(BaseAgent):
             sound_seq_estimated_unscaled
         )
         sound_unit_seq = sound_unit_seq[0].cpu().numpy()
-        art_unit_seq = art_unit_seq[0].cpu().numpy()
+        # art_unit_seq = art_unit_seq[0].cpu().numpy()
 
         sound_seq_repeated = self.synthesizer.synthesize(art_seq_estimated)
         return {
@@ -147,5 +147,5 @@ class CommunicativeAgent(BaseAgent):
             "sound_repeated": sound_seq_repeated,
             "sound_estimated": sound_seq_estimated,
             "art_estimated": art_seq_estimated,
-            "art_units": art_unit_seq,
+            # "art_units": art_unit_seq,
         }
