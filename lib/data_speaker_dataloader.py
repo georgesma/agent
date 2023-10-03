@@ -53,8 +53,10 @@ def get_dataloaders(dataset_config, data_scaler, datasplits):
     for dataset_name in dataset_config["names"]:
         dataset = Dataset(dataset_name)
         dataset_items_data = dataset.get_items_data(
-            dataset_config["data_type"], cut_silences=True
+            dataset_config["data_types"], cut_silences=True
         )
+        datasets_data[dataset_name] = dataset_items_data
+
         dataset_items_name = list(dataset_items_data.keys())
         if dataset_name not in datasplits:
             dataset_datasplits = utils.shuffle_and_split(
@@ -63,8 +65,6 @@ def get_dataloaders(dataset_config, data_scaler, datasplits):
                 dataset_config["datasplit_seed"],
             )
             datasplits[dataset_name] = dataset_datasplits
-
-        datasets_data[dataset_name] = dataset_items_data
 
     dataloaders = []
 

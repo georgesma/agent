@@ -18,13 +18,20 @@ class Quantizer:
         self.nb_speakers = len(self.config["dataset"]["names"])
         self.main_dataset = Dataset(config["dataset"]["names"][0])
 
+        if "data_type" in self.config["dataset"]:
+            self.config["dataset"]["data_types"] = [self.config["dataset"]["data_type"]]
+            del self.config["dataset"]["data_type"]
+
         if load_nn:
             self._build_nn(self.config["model"])
             self.nn.eval()
 
     def _build_nn(self, model_config):
-        self.data_dim = self.main_dataset.get_modality_dim(
-            self.config["dataset"]["data_type"]
+        self.data_dim = sum(
+            [
+                self.main_dataset.get_modality_dim(data_type)
+                for data_type in self.config["dataset"]["data_types"]
+            ]
         )
 
         self.nn = VQVAE(

@@ -87,23 +87,38 @@ class Dataset:
         items_name = [utils.parse_item_name(item_path) for item_path in items_path]
         return items_name
 
-    def get_items_data(self, modality, cut_silences=False):
-        data_pathname = "%s/%s/*.bin" % (self.path, modality)
-        items_path = glob(data_pathname)
-        items_path.sort()
+    def get_item_data(self, item_name, modalities, cut_silences=False):
+        if type(modalities) is not list:
+            modalities = [modalities]
 
-        modality_dim = self.get_modality_dim(modality)
-        items_data = {}
-        for item_path in items_path:
-            item_name = utils.parse_item_name(item_path)
-            item_data = np.fromfile(item_path, dtype="float32").reshape(
+        modalities_data = []
+        for modality in modalities:
+            item_path = "%s/%s/%s.bin" % (self.path, modality, item_name)
+
+            modality_dim = self.get_modality_dim(modality)
+            modality_data = np.fromfile(item_path, dtype="float32").reshape(
                 (-1, modality_dim)
             )
-
             if cut_silences is True:
-                item_data = self.cut_item_silences(item_name, item_data)
+                modality_data = self.cut_item_silences(item_name, modality_data)
+            modalities_data.append(modality_data)
 
-            items_data[item_name] = item_data
+        if len(modalities) == 1:
+            item_data = modalities_data[0]
+        else:
+            item_data = np.concatenate(modalities_data, axis=1)
+
+        return item_data
+
+    def get_items_data(self, modalities, cut_silences=False):
+        first_modality = modalities[0] if type(modalities) is list else modalities
+        items_name = self.get_items_name(first_modality)
+
+        items_data = {}
+        for item_name in items_name:
+            items_data[item_name] = self.get_item_data(
+                item_name, modalities, cut_silences
+            )
 
         return items_data
 
