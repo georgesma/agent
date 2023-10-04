@@ -186,7 +186,7 @@ def main():
             dataset_name,
             dataset_infos["lab_pathname"],
             dataset_infos["lab_resolution"],
-            100,
+            frames_sampling_rate,
         )
         print("Resampling LAB files done")
 
