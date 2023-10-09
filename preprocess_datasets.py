@@ -13,19 +13,45 @@ from external import lpcynet
 INT16_MAX_VALUE = 32767
 
 
-def preprocess_wav(dataset_name, wav_pathname, target_sampling_rate):
+def rms(y):
+    return np.sqrt(np.mean((y * 1.0) ** 2))
+
+
+def compute_wav_rms(wav_pathname):
+    wavfiles_path = glob(wav_pathname)
+
+    dataset_pcm = []
+    for wavfile_path in tqdm(wavfiles_path):
+        pcm, _ = librosa.load(wavfile_path, sr=None)
+        dataset_pcm.append(pcm)
+
+    dataset_pcm = np.concatenate(dataset_pcm, axis=0)
+    dataset_wav_rms = rms(dataset_pcm)
+    return dataset_wav_rms
+
+
+def preprocess_wav(
+    dataset_name, wav_pathname, target_sampling_rate, dataset_wav_rms, target_wav_rms
+):
     export_dir = "datasets/%s/wav" % dataset_name
     utils.mkdir(export_dir)
+
+    wav_scaling_factor = 1
+    if target_wav_rms is not None:
+        wav_scaling_factor = np.sqrt(target_wav_rms ** 2 / dataset_wav_rms ** 2)
 
     wavfiles_path = glob(wav_pathname)
 
     for wavfile_path in tqdm(wavfiles_path):
         pcm, wavfile_sampling_rate = librosa.load(wavfile_path, sr=None)
 
+        pcm = pcm * wav_scaling_factor
         if wavfile_sampling_rate != target_sampling_rate:
             pcm = librosa.resample(pcm, wavfile_sampling_rate, target_sampling_rate)
 
-        pcm = (pcm * INT16_MAX_VALUE).astype("int16")
+        pcm = pcm * INT16_MAX_VALUE
+        assert np.abs(pcm).max() <= INT16_MAX_VALUE
+        pcm = pcm.astype("int16")
         item_name = utils.parse_item_name(wavfile_path)
         wavfile.write("%s/%s.wav" % (export_dir, item_name), target_sampling_rate, pcm)
 
@@ -145,15 +171,28 @@ def preprocess_lab(dataset_name, lab_pathname, dataset_resolution, target_resolu
 def main():
     features_config = utils.read_yaml_file("./features_config.yaml")
     datasets_infos = utils.read_yaml_file("./datasets_infos.yaml")
+    datasets_wav_rms = {}
 
     for dataset_name, dataset_infos in datasets_infos.items():
         print("Preprocessing %s..." % dataset_name)
 
+        print("Computing RMS...")
+        dataset_wav_rms = compute_wav_rms(dataset_infos["wav_pathname"])
+        datasets_wav_rms[dataset_name] = dataset_wav_rms
+        print("Computing RMS done")
+
         print("Resampling WAV files...")
+        target_wav_rms = (
+            datasets_wav_rms[dataset_infos["wav_rms_reference"]]
+            if "wav_rms_reference" in dataset_infos
+            else None
+        )
         preprocess_wav(
             dataset_name,
             dataset_infos["wav_pathname"],
             features_config["wav_sampling_rate"],
+            dataset_wav_rms,
+            target_wav_rms,
         )
         print("Resampling WAV files done")
 

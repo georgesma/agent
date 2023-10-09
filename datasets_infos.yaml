@@ -11,12 +11,14 @@ pb2007:
 
 th2016:
   wav_pathname: ./external/raw_datasets/th2016/wav16/*.wav
+  wav_rms_reference: pb2007
   lab_pathname: ./external/raw_datasets/th2016/lab/*.lab
   lab_resolution: 10000000
   phones_infos: pb2007
 
 gb2016:
   wav_pathname: ./external/raw_datasets/gb2016/wav16/*.wav
+  wav_rms_reference: pb2007
   lab_pathname: ./external/raw_datasets/gb2016/lab/*.lab
   lab_resolution: 10000000
   phones_infos: pb2007

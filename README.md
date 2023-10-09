@@ -30,11 +30,16 @@ Download `fsew0_v1.1.tar.gz` and `msak0_v1.1.tar.gz` from https://data.cstr.ed.a
 To import a custom dataset, use the following description format:
 
 ```yaml
-# Name of the dataset
+# Dataset name
 pb2007:
     # [Required]
     # Path to wav files (`glob` format)
     wav_pathname: ./external/raw_datasets/pb2007/_wav16/*.wav
+
+    # [Optional]
+    # Name of the other dataset used as a reference for normalizing the RMS of sounds in the current dataset
+    # Note: the other dataset must be specified before the current one
+    wav_rms_reference: other_dataset_name
 
     # [Optional] If the dataset contains EMA data
     # Path to EMA data files (`glob` format)
