@@ -41,13 +41,17 @@ def train_quantizer(quantizer, save_path):
 
 
 def main():
-    for i_training in range(NB_TRAINING):
-        quantizer_config = utils.read_yaml_file("quantizer/quantizer_config.yaml")
-        quantizer = Quantizer(quantizer_config)
-        signature = quantizer.get_signature()
-        save_path = "out/quantizer/%s-%s" % (signature, i_training)
+    final_configs = utils.read_yaml_file("quantizer/quantizer_final_configs.yaml")
 
-        train_quantizer(quantizer, save_path)
+    for config_name, config in final_configs.items():
+        print(config_name)
+
+        for i_training in range(NB_TRAINING):
+            quantizer = Quantizer(config)
+            signature = quantizer.get_signature()
+            save_path = "out/quantizer/%s-%s" % (signature, i_training)
+
+            train_quantizer(quantizer, save_path)
 
 
 if __name__ == "__main__":

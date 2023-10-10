@@ -1,0 +1,71 @@
+pb2007-art_params:
+  model:
+    hidden_dims: [256, 256, 256]
+    activation: relu
+    dropout_p: 0.3
+    batch_norm: true
+    frame_padding: 2
+    num_embeddings: 512
+    embedding_dim: 128
+    commitment_cost: 1
+    use_speaker_id: true
+  dataset:
+    names: [pb2007]
+    data_types: [art_params]
+    datasplits_size: [64, 16, 20]
+    datasplit_seed: null
+    batch_size: 8
+    num_workers: 6
+    shuffle_between_epochs: true
+  training:
+    learning_rate: 0.003
+    max_epochs: 500
+    patience: 25
+
+pb2007-cepstrum:
+  model:
+    hidden_dims: [512, 512]
+    activation: relu
+    dropout_p: 0.2
+    batch_norm: true
+    frame_padding: 2
+    num_embeddings: 512
+    embedding_dim: 64
+    commitment_cost: 1.6
+    use_speaker_id: true
+  dataset:
+    names: [pb2007]
+    data_types: [cepstrum]
+    datasplits_size: [64, 16, 20] # train/validation/test in percentage
+    datasplit_seed: null
+    batch_size: 8
+    num_workers: 6
+    shuffle_between_epochs: true
+  training:
+    learning_rate: 0.0006
+    max_epochs: 500
+    patience: 25
+
+pb2007-cepstrum,art_params:
+  model:
+    hidden_dims: [128, 128]
+    activation: relu
+    dropout_p: 0.2
+    batch_norm: true
+    frame_padding: 2
+    num_embeddings: 512
+    embedding_dim: 128
+    commitment_cost: 1.65
+    use_speaker_id: true
+  dataset:
+    names: [pb2007]
+    data_types: [cepstrum, art_params]
+    datasplits_size: [64, 16, 20] # train/validation/test in percentage
+    datasplit_seed: null
+    batch_size: 8
+    num_workers: 6
+    shuffle_between_epochs: true
+  training:
+    learning_rate: 0.0006
+    max_epochs: 500
+    patience: 25
