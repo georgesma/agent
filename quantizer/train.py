@@ -47,6 +47,7 @@ def main():
         print(config_name)
 
         for i_training in range(NB_TRAINING):
+            config["dataset"]["datasplit_seed"] = i_training
             quantizer = Quantizer(config)
             signature = quantizer.get_signature()
             save_path = "out/quantizer/%s-%s" % (signature, i_training)

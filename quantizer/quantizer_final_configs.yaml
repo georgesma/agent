@@ -2,12 +2,12 @@ pb2007-art_params:
   model:
     hidden_dims: [256, 256, 256]
     activation: relu
-    dropout_p: 0.3
+    dropout_p: 0.32
     batch_norm: true
     frame_padding: 2
     num_embeddings: 512
-    embedding_dim: 128
-    commitment_cost: 1
+    embedding_dim: 64
+    commitment_cost: 1.08
     use_speaker_id: true
   dataset:
     names: [pb2007]
@@ -18,7 +18,7 @@ pb2007-art_params:
     num_workers: 6
     shuffle_between_epochs: true
   training:
-    learning_rate: 0.003
+    learning_rate: 0.002
     max_epochs: 500
     patience: 25
 
@@ -50,12 +50,12 @@ pb2007-cepstrum,art_params:
   model:
     hidden_dims: [128, 128]
     activation: relu
-    dropout_p: 0.2
+    dropout_p: 0.1
     batch_norm: true
     frame_padding: 2
     num_embeddings: 512
     embedding_dim: 128
-    commitment_cost: 1.65
+    commitment_cost: 1.7
     use_speaker_id: true
   dataset:
     names: [pb2007]
@@ -66,6 +66,6 @@ pb2007-cepstrum,art_params:
     num_workers: 6
     shuffle_between_epochs: true
   training:
-    learning_rate: 0.0006
+    learning_rate: 0.0008
     max_epochs: 500
     patience: 25
