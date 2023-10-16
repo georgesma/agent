@@ -176,6 +176,12 @@ def main():
     for dataset_name, dataset_infos in datasets_infos.items():
         print("Preprocessing %s..." % dataset_name)
 
+        wavfiles_path = glob(dataset_infos["wav_pathname"])
+        if len(wavfiles_path) == 0:
+            print("Dataset %s not found" % dataset_name)
+            print("")
+            continue
+
         print("Computing RMS...")
         dataset_wav_rms = compute_wav_rms(dataset_infos["wav_pathname"])
         datasets_wav_rms[dataset_name] = dataset_wav_rms
