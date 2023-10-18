@@ -16,50 +16,62 @@ NB_DERIVATIVES = [0]
 ART_TYPE = "art_params"
 
 
+def train_agent(agent, save_path):
+    print("Training %s" % save_path)
+    if os.path.isdir(save_path):
+        print("Already done")
+        print()
+        return
+
+    dataloaders = agent.get_dataloaders()
+    optimizers = agent.get_optimizers()
+    losses_fn = agent.get_losses_fn()
+
+    sound_scalers = {
+        "synthesizer": DataScaler.from_standard_scaler(
+            agent.synthesizer.sound_scaler
+        ).to("cuda"),
+        "agent": DataScaler.from_standard_scaler(agent.sound_scaler).to("cuda"),
+    }
+
+    trainer = Trainer(
+        agent.nn,
+        optimizers,
+        *dataloaders,
+        losses_fn,
+        agent.config["training"]["max_epochs"],
+        agent.config["training"]["patience"],
+        agent.synthesizer,
+        sound_scalers,
+        "./out/checkpoint.pt",
+    )
+    metrics_record = trainer.train()
+
+    utils.mkdir(save_path)
+    agent.save(save_path)
+    with open(save_path + "/metrics.pickle", "wb") as f:
+        pickle.dump(metrics_record, f)
+
+
 def main():
-    for i_training in range(NB_TRAINING):
-        for jerk_loss_weight in JERK_LOSS_WEIGHTS:
-            agent_config = utils.read_yaml_file("communicative_agent/communicative_config.yaml")
-            agent_config["training"]["jerk_loss_weight"] = jerk_loss_weight
+    final_configs = utils.read_yaml_file("communicative_agent/communicative_final_configs.yaml")
+    final_quantizer_configs = utils.read_yaml_file("quantizer/quantizer_final_configs.yaml")
 
-            agent = CommunicativeAgent(agent_config)
-            signature = agent.get_signature()
-            save_path = "out/communicative_agent/%s-%s" % (signature, i_training)
+    for config_name, config in final_configs.items():
+        quantizer_config = final_quantizer_configs["%s-cepstrum" % config_name]
 
-            print("Training %s (i_training=%s)" % (signature, i_training))
-            if os.path.isdir(save_path):
-                print("Already done")
-                print()
-                continue
+        for i_training in range(NB_TRAINING):
+            quantizer_config["dataset"]["datasplit_seed"] = i_training
+            quantizer_signature = utils.get_variable_signature(quantizer_config)
 
-            dataloaders = agent.get_dataloaders()
-            optimizers = agent.get_optimizers()
-            losses_fn = agent.get_losses_fn()
+            for jerk_loss_weight in JERK_LOSS_WEIGHTS:
+                config["sound_quantizer"]["name"] = "%s-%s" % (quantizer_signature, i_training)
+                config["training"]["jerk_loss_weight"] = jerk_loss_weight
 
-            sound_scalers = {
-                "synthesizer": DataScaler.from_standard_scaler(
-                    agent.synthesizer.sound_scaler
-                ).to("cuda"),
-                "agent": DataScaler.from_standard_scaler(agent.sound_scaler).to("cuda"),
-            }
-
-            trainer = Trainer(
-                agent.nn,
-                optimizers,
-                *dataloaders,
-                losses_fn,
-                agent_config["training"]["max_epochs"],
-                agent_config["training"]["patience"],
-                agent.synthesizer,
-                sound_scalers,
-                "./out/checkpoint.pt",
-            )
-            metrics_record = trainer.train()
-
-            utils.mkdir(save_path)
-            agent.save(save_path)
-            with open(save_path + "/metrics.pickle", "wb") as f:
-                pickle.dump(metrics_record, f)
+                agent = CommunicativeAgent(config)
+                signature = agent.get_signature()
+                save_path = "out/communicative_agent/%s-%s" % (signature, i_training)
+                train_agent(agent, save_path)
 
 
 if __name__ == "__main__":
