@@ -1,4 +1,4 @@
-# Self-supervised speech unit discovery from articulatory and acoustic features using VQ-VAE
+# Self-supervised learning of the relationships between speech sounds, articulatory gestures and phonetic units
 
 ## Setup
 
@@ -22,8 +22,6 @@ Download `PB2007.zip` from https://zenodo.org/record/6390598 and extract its con
 ##### MOCHA-TIMIT
 
 Download `fsew0_v1.1.tar.gz` and `msak0_v1.1.tar.gz` from https://data.cstr.ed.ac.uk/mocha/ and extract their content in `./external/raw_datasets/fsew0`  and `./raw_datasets/msak0` respectively.
-
-1. Run `python preprocess_datasets.py` to extract the features needed for the experiments.
 
 #### `datasets_infos.yaml` format
 
@@ -62,4 +60,41 @@ pb2007:
     lab_pathname: ./external/raw_datasets/pb2007/_lab/*.lab
     # Factor by which the `.lab` timings must be divided to be in seconds
     lab_resolution: 10000000
+
+    # [Optional] Name of the phonemic information group related to the dataset described in `phones_infos.yaml`
+    # No need to specify it if the group has the same name as the dataset
+    phones_infos: mocha
 ```
+
+## Project organization
+
+* `communicative_agent/`
+* * Full agent
+* `extras/`
+* * Extras scripts used for optional verifications
+* `imitative_agent/`
+* * Agent without discretization mechanisms (uses`acoustic space as goal)
+* `out/`
+* * Contains scripts output (trained models, cached results)
+* `synthesizer/`
+* * The articulatory synthesizer
+* `datasets/`
+* * Contains the imported and processed datasets
+* `external/`
+* * Contains the imported resources (raw datasets, LPCynet)
+* `lib/`
+* * Scripts and libraries used by the whole project
+* `quantizer/`
+* * Acoustic and articulatory quantizers
+* `datasets_infos.yaml`
+* * File describing the datasets to import
+* `README.md`
+* * This file
+* `preprocess_datasets.py`
+* * Script used for datasets importation and processing
+* `features_config.yaml`
+* * Describes the data format used globally
+* `phones_infos.yaml`
+* * Describes the phonetic content of the datasets
+* `requirements.txt`
+* * Versions of Python and libraries used
