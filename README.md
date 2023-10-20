@@ -1,5 +1,38 @@
 # Self-supervised learning of the relationships between speech sounds, articulatory gestures and phonetic units
 
+## Project organization
+
+* `communicative_agent/`
+  * Full agent
+* `extras/`
+  * Extras scripts used for optional verifications
+* `imitative_agent/`
+  * Agent without discretization mechanisms (uses acoustic space as goal)
+* `out/`
+  * Contains scripts output (trained models, cached results)
+* `synthesizer/`
+  * The articulatory synthesizer
+* `datasets/`
+  * Contains the imported and processed datasets
+* `external/`
+  * Contains the imported resources (raw datasets, LPCynet)
+* `lib/`
+  * Scripts and libraries used by the whole project
+* `quantizer/`
+  * Acoustic and articulatory quantizers
+* `datasets_infos.yaml`
+  * File describing the datasets to import
+* `README.md`
+  * This file
+* `preprocess_datasets.py`
+  * Script used for datasets importation and processing
+* `features_config.yaml`
+  * Describes the data format used globally
+* `phones_infos.yaml`
+  * Describes the phonetic content of the datasets
+* `requirements.txt`
+  * Versions of Python and libraries used
+
 ## Setup
 
 ### LPCNet importation
@@ -65,36 +98,3 @@ pb2007:
     # No need to specify it if the group has the same name as the dataset
     phones_infos: mocha
 ```
-
-## Project organization
-
-* `communicative_agent/`
-* * Full agent
-* `extras/`
-* * Extras scripts used for optional verifications
-* `imitative_agent/`
-* * Agent without discretization mechanisms (uses`acoustic space as goal)
-* `out/`
-* * Contains scripts output (trained models, cached results)
-* `synthesizer/`
-* * The articulatory synthesizer
-* `datasets/`
-* * Contains the imported and processed datasets
-* `external/`
-* * Contains the imported resources (raw datasets, LPCynet)
-* `lib/`
-* * Scripts and libraries used by the whole project
-* `quantizer/`
-* * Acoustic and articulatory quantizers
-* `datasets_infos.yaml`
-* * File describing the datasets to import
-* `README.md`
-* * This file
-* `preprocess_datasets.py`
-* * Script used for datasets importation and processing
-* `features_config.yaml`
-* * Describes the data format used globally
-* `phones_infos.yaml`
-* * Describes the phonetic content of the datasets
-* `requirements.txt`
-* * Versions of Python and libraries used
