@@ -8,6 +8,7 @@ from lib import abx_utils
 from quantizer import Quantizer
 from trainer import Trainer
 
+DATASETS_NAME = [["pb2007"]]
 DATASPLIT_SEED = 1337
 ABX_NB_SAMPLES = 50
 QUANTIZER_ABX_DISTANCE = {"quantized_latent": {"metric": "cosine", "weight": 1}}
@@ -67,26 +68,36 @@ def get_quantizer_abx_score(quantizer):
     return global_abx_score
 
 
-def train_with_hyperparameters(hyperparameters):
-    quantizer_config = utils.read_yaml_file("quantizer/quantizer_config.yaml")
-    quantizer_config["dataset"]["datasplit_seed"] = DATASPLIT_SEED
+def train_on_datasets(datasets_name):
+    def train_with_hyperparameters(hyperparameters):
+        quantizer_config = utils.read_yaml_file("quantizer/quantizer_config.yaml")
+        quantizer_config["dataset"]["datasplit_seed"] = DATASPLIT_SEED
+        quantizer_config["dataset"]["names"] = datasets_name
 
-    quantizer_config["training"]["learning_rate"] = hyperparameters["learning_rate"]
-    quantizer_config["model"]["dropout_p"] = hyperparameters["dropout_p"]
-    quantizer_config["model"]["commitment_cost"] = hyperparameters["commitment_cost"]
-    quantizer_config["model"]["hidden_dims"] = [
-        int(2 ** hyperparameters["dim_hidden_layers"])
-    ] * int(hyperparameters["nb_hidden_layers"])
-    quantizer_config["model"]["num_embeddings"] = int(2 ** hyperparameters["num_embeddings"])
-    quantizer_config["model"]["embedding_dim"] = int(2 ** hyperparameters["embedding_dim"])
+        quantizer_config["training"]["learning_rate"] = hyperparameters["learning_rate"]
+        quantizer_config["model"]["dropout_p"] = hyperparameters["dropout_p"]
+        quantizer_config["model"]["commitment_cost"] = hyperparameters[
+            "commitment_cost"
+        ]
+        quantizer_config["model"]["hidden_dims"] = [
+            int(2 ** hyperparameters["dim_hidden_layers"])
+        ] * int(hyperparameters["nb_hidden_layers"])
+        quantizer_config["model"]["num_embeddings"] = int(
+            2 ** hyperparameters["num_embeddings"]
+        )
+        quantizer_config["model"]["embedding_dim"] = int(
+            2 ** hyperparameters["embedding_dim"]
+        )
 
-    quantizer = Quantizer(quantizer_config)
-    signature = quantizer.get_signature()
-    save_path = "out/quantizer/%s" % (signature)
+        quantizer = Quantizer(quantizer_config)
+        signature = quantizer.get_signature()
+        save_path = "out/quantizer/%s" % (signature)
 
-    train_quantizer(quantizer, save_path)
-    abx_score = get_quantizer_abx_score(quantizer)
-    return 100 - abx_score
+        train_quantizer(quantizer, save_path)
+        abx_score = get_quantizer_abx_score(quantizer)
+        return 100 - abx_score
+
+    return train_with_hyperparameters
 
 
 def main():
@@ -100,14 +111,16 @@ def main():
         "embedding_dim": hp.quniform("embedding_dim", 3, 7, 1),
     }
 
-    best_config = fmin(
-        fn=train_with_hyperparameters,
-        space=hyperparameters_space,
-        algo=tpe.suggest,
-        max_evals=100,
-    )
-    print("best config:")
-    print(best_config)
+    for datasets_name in DATASETS_NAME:
+        train_with_hyperparameters = train_on_datasets(datasets_name)
+        best_config = fmin(
+            fn=train_with_hyperparameters,
+            space=hyperparameters_space,
+            algo=tpe.suggest,
+            max_evals=100,
+        )
+        print("best config:")
+        print(best_config)
 
 
 if __name__ == "__main__":
