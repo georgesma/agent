@@ -9,6 +9,7 @@ from quantizer import Quantizer
 from trainer import Trainer
 
 DATASETS_NAME = [["pb2007"]]
+MODALITIES = [["cepstrum"], ["art_params"], ["cepstrum", "art_params"]]
 DATASPLIT_SEED = 1337
 ABX_NB_SAMPLES = 50
 QUANTIZER_ABX_DISTANCE = {"quantized_latent": {"metric": "cosine", "weight": 1}}
@@ -68,11 +69,12 @@ def get_quantizer_abx_score(quantizer):
     return global_abx_score
 
 
-def train_on_datasets(datasets_name):
+def get_training_fn(datasets_name, modalities):
     def train_with_hyperparameters(hyperparameters):
         quantizer_config = utils.read_yaml_file("quantizer/quantizer_config.yaml")
         quantizer_config["dataset"]["datasplit_seed"] = DATASPLIT_SEED
         quantizer_config["dataset"]["names"] = datasets_name
+        quantizer_config["dataset"]["data_types"] = modalities
 
         quantizer_config["training"]["learning_rate"] = hyperparameters["learning_rate"]
         quantizer_config["model"]["dropout_p"] = hyperparameters["dropout_p"]
@@ -112,15 +114,16 @@ def main():
     }
 
     for datasets_name in DATASETS_NAME:
-        train_with_hyperparameters = train_on_datasets(datasets_name)
-        best_config = fmin(
-            fn=train_with_hyperparameters,
-            space=hyperparameters_space,
-            algo=tpe.suggest,
-            max_evals=100,
-        )
-        print("best config:")
-        print(best_config)
+        for modalities in MODALITIES:
+            train_with_hyperparameters = get_training_fn(datasets_name, modalities)
+            best_config = fmin(
+                fn=train_with_hyperparameters,
+                space=hyperparameters_space,
+                algo=tpe.suggest,
+                max_evals=100,
+            )
+            print("best config:")
+            print(best_config)
 
 
 if __name__ == "__main__":
