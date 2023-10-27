@@ -79,6 +79,8 @@ class Dataset:
             return len(self.infos["ema_coils_order"])
         elif modality == "art_params":
             return len(self.infos["ema_coils_order"]) // 2
+        elif modality.startswith("agent_art_"):
+            return len(self.infos["ema_coils_order"]) // 2
 
     def get_items_name(self, modality):
         data_pathname = "%s/%s/*.bin" % (self.path, modality)
@@ -87,45 +89,38 @@ class Dataset:
         items_name = [utils.parse_item_name(item_path) for item_path in items_path]
         return items_name
 
-    def get_item_data(self, item_name, modalities, cut_silences=False):
-        if type(modalities) is not list:
-            modalities = [modalities]
-
-        modalities_data = []
-        for modality in modalities:
+    def get_items_modality_data(self, modality, cut_silences=False):
+        items_name = self.get_items_name(modality)
+        items_modality_data = {}
+        modality_dim = self.get_modality_dim(modality)
+        for item_name in items_name:
             item_path = "%s/%s/%s.bin" % (self.path, modality, item_name)
-
-            modality_dim = self.get_modality_dim(modality)
             modality_data = np.fromfile(item_path, dtype="float32").reshape(
                 (-1, modality_dim)
             )
             if cut_silences is True:
                 modality_data = self.cut_item_silences(item_name, modality_data)
-            modalities_data.append(modality_data)
 
-        if len(modalities) == 1:
-            item_data = modalities_data[0]
-        else:
-            min_modality_data_len = min(
-                (len(modality_data) for modality_data in modalities_data)
-            )
-            modalities_data = [
-                modality_data[:min_modality_data_len]
-                for modality_data in modalities_data
-            ]
-            item_data = np.concatenate(modalities_data, axis=1)
+            items_modality_data[item_name] = modality_data
 
-        return item_data
+        return items_modality_data
 
     def get_items_data(self, modalities, cut_silences=False):
-        first_modality = modalities[0] if type(modalities) is list else modalities
-        items_name = self.get_items_name(first_modality)
+        items_data = None
+        for modality in modalities:
+            items_modality_data = self.get_items_modality_data(modality, cut_silences)
 
-        items_data = {}
-        for item_name in items_name:
-            items_data[item_name] = self.get_item_data(
-                item_name, modalities, cut_silences
-            )
+            if items_data is None:
+                items_data = items_modality_data
+            else:
+                for item_name, item_data in items_data.items():
+                    item_modality_data = items_modality_data[item_name]
+                    shortest_len = min(len(item_data), len(item_modality_data))
+                    combined_item_data = np.concatenate(
+                        (item_data[:shortest_len], item_modality_data[:shortest_len]),
+                        axis=1,
+                    )
+                    items_data[item_name] = combined_item_data
 
         return items_data
 

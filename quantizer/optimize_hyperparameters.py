@@ -9,7 +9,8 @@ from quantizer import Quantizer
 from trainer import Trainer
 
 DATASETS_NAME = [["pb2007"]]
-MODALITIES = [["cepstrum"], ["art_params"], ["cepstrum", "art_params"]]
+# MODALITIES = [["cepstrum"], ["art_params"], ["cepstrum", "art_params"]]
+MODALITIES = [["agent_art_97a400f946a1202ec39bbf5546749656-2"], ["agent_art_aabf90478c0629fd266913e4b0ea1b72-3"]]
 DATASPLIT_SEED = 1337
 ABX_NB_SAMPLES = 50
 QUANTIZER_ABX_DISTANCE = {"quantized_latent": {"metric": "cosine", "weight": 1}}
@@ -93,7 +94,7 @@ def get_training_fn(datasets_name, modalities):
 
         quantizer = Quantizer(quantizer_config)
         signature = quantizer.get_signature()
-        save_path = "out/quantizer/%s" % (signature)
+        save_path = "./out/quantizer/%s" % (signature)
 
         train_quantizer(quantizer, save_path)
         abx_score = get_quantizer_abx_score(quantizer)
