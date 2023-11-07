@@ -4,8 +4,8 @@ from lib.dataset_wrapper import Dataset
 from lib import utils
 
 AGENTS = [
-    "97a400f946a1202ec39bbf5546749656-2",
-    "aabf90478c0629fd266913e4b0ea1b72-3",
+    "97a400f946a1202ec39bbf5546749656-2", # jerk_loss_weight = 0
+    "aabf90478c0629fd266913e4b0ea1b72-3", # jerk_loss_weight = 0.15
 ]
 DATASETS = [
     "pb2007",
