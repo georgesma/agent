@@ -90,13 +90,14 @@ class Trainer:
                         sound_seqs, speaker_seqs
                     )
                     sound_unit_seqs = sound_unit_seqs.detach()
-                self.step_direct_model(
-                    sound_unit_seqs,
-                    seqs_len,
-                    seqs_mask,
-                    epoch_record,
-                    is_training=is_training,
-                )
+                if "direct_model" in self.optimizers:
+                    self.step_direct_model(
+                        sound_unit_seqs,
+                        seqs_len,
+                        seqs_mask,
+                        epoch_record,
+                        is_training=is_training,
+                    )
                 self.step_inverse_model(
                     sound_unit_seqs,
                     seqs_len,

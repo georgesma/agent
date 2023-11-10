@@ -58,7 +58,8 @@ def main():
     final_quantizer_configs = utils.read_yaml_file("quantizer/quantizer_final_configs.yaml")
 
     for config_name, config in final_configs.items():
-        quantizer_config = final_quantizer_configs["%s-cepstrum" % config_name]
+        quantizer_name = config_name.split("-")[0]
+        quantizer_config = final_quantizer_configs["%s-cepstrum" % quantizer_name]
 
         for i_training in range(NB_TRAINING):
             quantizer_config["dataset"]["datasplit_seed"] = i_training

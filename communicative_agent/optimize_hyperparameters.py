@@ -65,15 +65,19 @@ def train_with_hyperparameters(hyperparameters):
         "inverse_model_dropout_p"
     ]
 
-    agent_config["training"]["direct_model_learning_rate"] = hyperparameters[
-        "direct_model_learning_rate"
-    ]
-    agent_config["model"]["direct_model"]["dropout_p"] = hyperparameters[
-        "direct_model_dropout_p"
-    ]
-    agent_config["model"]["direct_model"]["hidden_layers"] = [
-        int(2 ** hyperparameters["direct_model_dim_hidden_layers"])
-    ] * int(hyperparameters["direct_model_nb_hidden_layers"])
+    if (
+        "use_synth_as_direct_model" not in agent_config["model"]
+        or not agent_config["model"]["use_synth_as_direct_model"]
+    ):
+        agent_config["training"]["direct_model_learning_rate"] = hyperparameters[
+            "direct_model_learning_rate"
+        ]
+        agent_config["model"]["direct_model"]["dropout_p"] = hyperparameters[
+            "direct_model_dropout_p"
+        ]
+        agent_config["model"]["direct_model"]["hidden_layers"] = [
+            int(2 ** hyperparameters["direct_model_dim_hidden_layers"])
+        ] * int(hyperparameters["direct_model_nb_hidden_layers"])
 
     agent = CommunicativeAgent(agent_config)
     signature = agent.get_signature()
@@ -87,6 +91,8 @@ def train_with_hyperparameters(hyperparameters):
 
 
 def main():
+    base_config = utils.read_yaml_file("communicative_agent/communicative_config.yaml")
+
     hyperparameters_space = {
         "inverse_model_learning_rate": hp.loguniform(
             "inverse_model_learning_rate", np.log(1e-4), np.log(1e-2)
@@ -94,17 +100,27 @@ def main():
         "inverse_model_num_layers": hp.quniform("inverse_model_num_layers", 1, 2, 1),
         "inverse_model_hidden_size": hp.quniform("inverse_model_hidden_size", 5, 6, 1),
         "inverse_model_dropout_p": hp.uniform("inverse_model_dropout_p", 0, 0.9),
-        "direct_model_learning_rate": hp.loguniform(
-            "direct_model_learning_rate", np.log(1e-4), np.log(1e-2)
-        ),
-        "direct_model_dropout_p": hp.uniform("direct_model_dropout_p", 0, 0.9),
-        "direct_model_dim_hidden_layers": hp.quniform(
-            "direct_model_dim_hidden_layers", 6, 9, 1
-        ),
-        "direct_model_nb_hidden_layers": hp.quniform(
-            "direct_model_nb_hidden_layers", 1, 4, 1
-        ),
     }
+
+    if (
+        "use_synth_as_direct_model" not in base_config["model"]
+        or not base_config["model"]["use_synth_as_direct_model"]
+    ):
+        hyperparameters_space = {
+            **hyperparameters_space,
+            **{
+                "direct_model_learning_rate": hp.loguniform(
+                    "direct_model_learning_rate", np.log(1e-4), np.log(1e-2)
+                ),
+                "direct_model_dropout_p": hp.uniform("direct_model_dropout_p", 0, 0.9),
+                "direct_model_dim_hidden_layers": hp.quniform(
+                    "direct_model_dim_hidden_layers", 6, 9, 1
+                ),
+                "direct_model_nb_hidden_layers": hp.quniform(
+                    "direct_model_nb_hidden_layers", 1, 4, 1
+                ),
+            },
+        }
 
     best_config = fmin(
         fn=train_with_hyperparameters,

@@ -20,3 +20,23 @@ pb2007:
     max_epochs: 500
     patience: 25
     jerk_loss_weight: 0
+
+pb2007-synth_as_direct:
+  model:
+    use_synth_as_direct_model: true
+    inverse_model:
+      num_layers: 2
+      hidden_size: 64
+      dropout_p: 0.25
+      bidirectional: true
+  synthesizer:
+    name: ea587b76c95fecef01cfd16c7f5f289d-3
+  sound_quantizer:
+    name: f50650bb40e1346ed24011c2e41b7153-4
+  training:
+    inverse_model_learning_rate: 0.0011
+    direct_model_learning_rate: 0.001
+    max_epochs: 500
+    patience: 25
+    jerk_loss_weight: 0
+

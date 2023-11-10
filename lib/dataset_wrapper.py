@@ -106,6 +106,9 @@ class Dataset:
         return items_modality_data
 
     def get_items_data(self, modalities, cut_silences=False):
+        if type(modalities) is not list:
+            modalities = [modalities]
+
         items_data = None
         for modality in modalities:
             items_modality_data = self.get_items_modality_data(modality, cut_silences)

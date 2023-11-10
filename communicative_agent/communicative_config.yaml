@@ -1,4 +1,5 @@
 model:
+  use_synth_as_direct_model: true
   direct_model:
     hidden_layers: [256, 256, 256, 256]
     activation: relu

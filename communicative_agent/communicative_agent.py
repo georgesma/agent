@@ -18,6 +18,13 @@ QUANTIZERS_PATH = os.path.join(os.path.dirname(__file__), "../out/quantizer")
 class CommunicativeAgent(BaseAgent):
     def __init__(self, config, load_nn=True):
         self.config = config
+        if "use_synth_as_direct_model" in self.config["model"]:
+            if self.config["model"]["use_synth_as_direct_model"]:
+                if "direct_model" in self.config["model"]:
+                    del self.config["model"]["direct_model"]
+            else:
+                del self.config["model"]["use_synth_as_direct_model"]
+
         self.synthesizer = Synthesizer.reload(
             "%s/%s" % (SYNTHESIZERS_PATH, config["synthesizer"]["name"]),
             load_nn=load_nn,
@@ -47,14 +54,17 @@ class CommunicativeAgent(BaseAgent):
             model_config["inverse_model"]["bidirectional"],
         )
 
-        direct_model = FeedForward(
-            self.art_dim,
-            self.sound_dim,
-            model_config["direct_model"]["hidden_layers"],
-            model_config["direct_model"]["activation"],
-            model_config["direct_model"]["dropout_p"],
-            model_config["direct_model"]["batch_norm"],
-        )
+        if "use_synth_as_direct_model" not in self.config["model"]:
+            direct_model = FeedForward(
+                self.art_dim,
+                self.sound_dim,
+                model_config["direct_model"]["hidden_layers"],
+                model_config["direct_model"]["activation"],
+                model_config["direct_model"]["dropout_p"],
+                model_config["direct_model"]["batch_norm"],
+            )
+        else:
+            direct_model = self.synthesizer.nn
 
         self.nn = CommunicativeAgentNN(
             inverse_model, direct_model, self.sound_quantizer.nn
@@ -64,16 +74,18 @@ class CommunicativeAgent(BaseAgent):
         return self.sound_quantizer.get_dataloaders()
 
     def get_optimizers(self):
-        return {
-            "inverse_model": torch.optim.Adam(
-                self.nn.inverse_model.parameters(),
-                lr=self.config["training"]["inverse_model_learning_rate"],
-            ),
-            "direct_model": torch.optim.Adam(
+        optimizers = {}
+        optimizers["inverse_model"] = torch.optim.Adam(
+            self.nn.inverse_model.parameters(),
+            lr=self.config["training"]["inverse_model_learning_rate"],
+        )
+        if "use_synth_as_direct_model" not in self.config["model"]:
+            optimizers["direct_model"] = torch.optim.Adam(
                 self.nn.direct_model.parameters(),
                 lr=self.config["training"]["direct_model_learning_rate"],
-            ),
-        }
+            )
+
+        return optimizers
 
     def get_losses_fn(self):
         art_scaler_var = torch.FloatTensor(self.synthesizer.art_scaler.var_).to("cuda")
