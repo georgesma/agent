@@ -69,3 +69,99 @@ pb2007-cepstrum,art_params:
     learning_rate: 0.0008
     max_epochs: 500
     patience: 25
+
+pb2007-repeated:
+  model:
+    hidden_dims: [512, 512, 512, 512]
+    activation: relu
+    dropout_p: 0.42
+    batch_norm: true
+    frame_padding: 2
+    num_embeddings: 512
+    embedding_dim: 32
+    commitment_cost: 1.17
+    use_speaker_id: true
+  dataset:
+    names: [pb2007]
+    data_types: null
+    datasplits_size: [64, 16, 20] # train/validation/test in percentage
+    datasplit_seed: null
+    batch_size: 8
+    num_workers: 6
+    shuffle_between_epochs: true
+  training:
+    learning_rate: 0.00037
+    max_epochs: 500
+    patience: 25
+
+pb2007-repeated_jerkloss:
+  model:
+    hidden_dims: [512, 512]
+    activation: relu
+    dropout_p: 0.42
+    batch_norm: true
+    frame_padding: 2
+    num_embeddings: 512
+    embedding_dim: 128
+    commitment_cost: 0.14
+    use_speaker_id: true
+  dataset:
+    names: [pb2007]
+    data_types: null
+    datasplits_size: [64, 16, 20] # train/validation/test in percentage
+    datasplit_seed: null
+    batch_size: 8
+    num_workers: 6
+    shuffle_between_epochs: true
+  training:
+    learning_rate: 0.0004
+    max_epochs: 500
+    patience: 25
+
+pb2007-repeated_synthasdirect:
+  model:
+    hidden_dims: [256]
+    activation: relu
+    dropout_p: 0.34
+    batch_norm: true
+    frame_padding: 2
+    num_embeddings: 512
+    embedding_dim: 128
+    commitment_cost: 1.8
+    use_speaker_id: true
+  dataset:
+    names: [pb2007]
+    data_types: null
+    datasplits_size: [64, 16, 20] # train/validation/test in percentage
+    datasplit_seed: null
+    batch_size: 8
+    num_workers: 6
+    shuffle_between_epochs: true
+  training:
+    learning_rate: 0.0038
+    max_epochs: 500
+    patience: 25
+
+pb2007-repeated_synthasdirect_jerkloss:
+  model:
+    hidden_dims: [128, 128]
+    activation: relu
+    dropout_p: 0.085
+    batch_norm: true
+    frame_padding: 2
+    num_embeddings: 512
+    embedding_dim: 128
+    commitment_cost: 0.87
+    use_speaker_id: true
+  dataset:
+    names: [pb2007]
+    data_types: null
+    datasplits_size: [64, 16, 20] # train/validation/test in percentage
+    datasplit_seed: null
+    batch_size: 8
+    num_workers: 6
+    shuffle_between_epochs: true
+  training:
+    learning_rate: 0.0046
+    max_epochs: 500
+    patience: 25

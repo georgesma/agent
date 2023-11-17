@@ -8,6 +8,7 @@ from trainer import Trainer
 
 NB_TRAINING = 5
 
+
 def train_quantizer(quantizer, save_path):
     print("Training %s" % (save_path))
     if os.path.isdir(save_path):
@@ -42,14 +43,19 @@ def train_quantizer(quantizer, save_path):
 
 def main():
     final_configs = utils.read_yaml_file("quantizer/quantizer_final_configs.yaml")
+    repeated_datasets = utils.read_yaml_file("quantizer/repeated_datasets.yaml")
 
     for config_name, config in final_configs.items():
         print(config_name)
-        _, modalities = config_name.split("-")
-        if modalities.startswith("repeated"):
+        dataset_name, modalities = config_name.split("-")
+        if not modalities.startswith("repeated"):
             continue
 
         for i_training in range(NB_TRAINING):
+            repeated_name = repeated_datasets[dataset_name][modalities][i_training]
+            modality_name = "agent_art_%s" % repeated_name
+            config["dataset"]["data_types"] = [modality_name]
+
             config["dataset"]["datasplit_seed"] = i_training
             quantizer = Quantizer(config)
             signature = quantizer.get_signature()
