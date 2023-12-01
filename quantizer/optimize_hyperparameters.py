@@ -12,16 +12,16 @@ DATASETS_NAME = [["pb2007"]]
 # MODALITIES = [["cepstrum"], ["art_params"], ["cepstrum", "art_params"]]
 
 # direct_model != synthesizer
-# MODALITIES = [
-#     ["agent_art_97a400f946a1202ec39bbf5546749656-2"], # jerk = 0
-#     ["agent_art_aabf90478c0629fd266913e4b0ea1b72-3"], # jerk = 0.15
-# ]
+MODALITIES = [
+    ["agent_cepstrum_97a400f946a1202ec39bbf5546749656-2"], # jerk = 0
+    # ["agent_art_aabf90478c0629fd266913e4b0ea1b72-3"], # jerk = 0.15
+]
 
 # direct_model == synthesizer
-MODALITIES = [
-    # ["agent_art_f9ce1417898b61bca0230bc5c43db9b8-1"], # jerk = 0
-    ["agent_art_4936c9a76095bd94ddd8ce4f066b8bde-2"], # jerk = 0.15
-]
+# MODALITIES = [
+#     ["agent_art_f9ce1417898b61bca0230bc5c43db9b8-1"], # jerk = 0
+#     ["agent_art_4936c9a76095bd94ddd8ce4f066b8bde-2"], # jerk = 0.15
+# ]
 DATASPLIT_SEED = 1337
 ABX_NB_SAMPLES = 50
 QUANTIZER_ABX_DISTANCE = {"quantized_latent": {"metric": "cosine", "weight": 1}}

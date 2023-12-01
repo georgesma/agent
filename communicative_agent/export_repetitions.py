@@ -3,30 +3,32 @@ from communicative_agent import CommunicativeAgent
 from lib.dataset_wrapper import Dataset
 from lib import utils
 
-AGENTS = [
-    "97a400f946a1202ec39bbf5546749656-2", # jerk_loss_weight = 0
-    "aabf90478c0629fd266913e4b0ea1b72-3", # jerk_loss_weight = 0.15
-]
 DATASETS = [
     "pb2007",
 ]
 NB_TRAINING = 5
 JERK_LOSS_WEIGHTS = [0, 0.15]
 
-def export_agent_art(agent, agent_name):
+def export_agent_repetitions(agent, agent_name):
     for dataset_name in DATASETS:
         print("%s repeats %s" % (agent_name, dataset_name))
         dataset = Dataset(dataset_name)
         sound_type = agent.sound_quantizer.config["dataset"]["data_types"]
         items_sound = dataset.get_items_data(sound_type)
-        repetition_export_dir = "./datasets/%s/agent_art_%s" % (dataset_name, agent_name)
-        utils.mkdir(repetition_export_dir)
+        repetition_art_export_dir = "./datasets/%s/agent_art_%s" % (dataset_name, agent_name)
+        repetition_cepstrum_export_dir = "./datasets/%s/agent_cepstrum_%s" % (dataset_name, agent_name)
+        utils.mkdir(repetition_art_export_dir)
+        utils.mkdir(repetition_cepstrum_export_dir)
 
         for item_name, item_sound in tqdm(items_sound.items()):
             repetition = agent.repeat(item_sound)
             repetition_art = repetition["art_estimated"]
-            repetition_file_path = "%s/%s.bin" % (repetition_export_dir, item_name)
-            repetition_art.tofile(repetition_file_path)
+            repetition_art_file_path = "%s/%s.bin" % (repetition_art_export_dir, item_name)
+            repetition_art.tofile(repetition_art_file_path)
+
+            repetition_cepstrum = repetition["sound_repeated"]
+            repetition_cepstrum_file_path = "%s/%s.bin" % (repetition_cepstrum_export_dir, item_name)
+            repetition_cepstrum.tofile(repetition_cepstrum_file_path)
 
 
 def main():
@@ -59,7 +61,7 @@ def main():
                 agent_name = "%s-%s" % (agent_signature, i_training)
                 agent_path = "out/communicative_agent/%s" % agent_name
                 agent = CommunicativeAgent.reload(agent_path)
-                export_agent_art(agent, agent_name)
+                export_agent_repetitions(agent, agent_name)
 
 
 if __name__ == "__main__":

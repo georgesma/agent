@@ -49,14 +49,21 @@ def main():
         print(config_name)
         dataset_name, modalities = config_name.split("-")
         if not modalities.startswith("repeated"):
+            print("pass")
             continue
+
+        repeated_type = "art"
+        if modalities.endswith("cepstrum"):
+            modalities = modalities[:-len("cepstrum")]
+            repeated_type = "cepstrum"
 
         for i_training in range(NB_TRAINING):
             repeated_name = repeated_datasets[dataset_name][modalities][i_training]
-            modality_name = "agent_art_%s" % repeated_name
+            modality_name = "agent_%s_%s" % (repeated_type, repeated_name)
             config["dataset"]["data_types"] = [modality_name]
 
             config["dataset"]["datasplit_seed"] = i_training
+
             quantizer = Quantizer(config)
             signature = quantizer.get_signature()
             save_path = "out/quantizer/%s-%s" % (signature, i_training)

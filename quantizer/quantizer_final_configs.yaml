@@ -165,3 +165,27 @@ pb2007-repeated_synthasdirect_jerkloss:
     learning_rate: 0.0046
     max_epochs: 500
     patience: 25
+
+pb2007-repeatedcepstrum:
+  model:
+    hidden_dims: [128, 128]
+    activation: relu
+    dropout_p: 0.12
+    batch_norm: true
+    frame_padding: 2
+    num_embeddings: 512
+    embedding_dim: 32
+    commitment_cost: 1.93
+    use_speaker_id: true
+  dataset:
+    names: [pb2007]
+    data_types: null
+    datasplits_size: [64, 16, 20] # train/validation/test in percentage
+    datasplit_seed: null
+    batch_size: 8
+    num_workers: 6
+    shuffle_between_epochs: true
+  training:
+    learning_rate: 0.0027
+    max_epochs: 500
+    patience: 25

@@ -81,6 +81,8 @@ class Dataset:
             return len(self.infos["ema_coils_order"]) // 2
         elif modality.startswith("agent_art_"):
             return len(self.infos["ema_coils_order"]) // 2
+        elif modality.startswith("agent_cepstrum_"):
+            return 18
 
     def get_items_name(self, modality):
         data_pathname = "%s/%s/*.bin" % (self.path, modality)
