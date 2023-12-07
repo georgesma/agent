@@ -189,3 +189,27 @@ pb2007-repeatedcepstrum:
     learning_rate: 0.0027
     max_epochs: 500
     patience: 25
+
+gb2016,th2016-cepstrum:
+  model:
+    hidden_dims: [512, 512]
+    activation: relu
+    dropout_p: 0.16
+    batch_norm: true
+    frame_padding: 2
+    num_embeddings: 512
+    embedding_dim: 64
+    commitment_cost: 1.7
+    use_speaker_id: true
+  dataset:
+    names: [pb2007]
+    data_types: [cepstrum]
+    datasplits_size: [64, 16, 20] # train/validation/test in percentage
+    datasplit_seed: null
+    batch_size: 8
+    num_workers: 6
+    shuffle_between_epochs: true
+  training:
+    learning_rate: 0.0004
+    max_epochs: 500
+    patience: 25
