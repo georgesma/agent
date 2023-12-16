@@ -26,6 +26,8 @@ def plot_groups_metrics(groups_metrics, metrics_name, split_name="test"):
                     transform=ax.transAxes,
                 )
             for metrics in group_metrics.values():
+                if metric_name not in metrics[split_name]:
+                    continue
                 ax.set_title(metric_name)
                 ax.plot(metrics[split_name][metric_name])
                 last_epoch = len(metrics[split_name][metric_name]) - 1

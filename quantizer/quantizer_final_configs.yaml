@@ -202,7 +202,7 @@ gb2016,th2016-cepstrum:
     commitment_cost: 1.7
     use_speaker_id: true
   dataset:
-    names: [pb2007]
+    names: [gb2016, th2016]
     data_types: [cepstrum]
     datasplits_size: [64, 16, 20] # train/validation/test in percentage
     datasplit_seed: null
