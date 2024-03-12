@@ -1,4 +1,4 @@
-import os
+import os, sys
 import pickle
 import numpy as np
 
@@ -7,7 +7,9 @@ from quantizer import Quantizer
 from trainer import Trainer
 
 NB_TRAINING = 5
-
+print("current path:", os.getcwd())
+# sys.path.insert(0, "/Users/ladislas/Desktop/motor_control_agent")
+sys.path.insert(0, "/mnt/c/Users/vpaul/Documents/Inner_Speech/agent")
 
 def train_quantizer(quantizer, save_path):
     print("Training %s" % (save_path))

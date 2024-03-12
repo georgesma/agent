@@ -2,7 +2,9 @@ import os
 import pickle
 from hyperopt import tpe, hp, fmin
 import numpy as np
-
+print("current path:", os.getcwd())
+# sys.path.insert(0, "/Users/ladislas/Desktop/motor_control_agent")
+sys.path.insert(0, "/mnt/c/Users/vpaul/Documents/Inner_Speech/agent")
 from lib import utils
 from lib import abx_utils
 from quantizer import Quantizer

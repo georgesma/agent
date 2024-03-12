@@ -3,12 +3,12 @@ import torch.nn.functional as F
 import pickle
 import yaml
 from sklearn.preprocessing import StandardScaler
-
 from lib import utils
 from lib.data_speaker_dataloader import get_dataloaders
 from lib.dataset_wrapper import Dataset
 from lib.nn.vq_vae import VQVAE
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
 class Quantizer:
     def __init__(self, config, load_nn=True):
@@ -45,7 +45,7 @@ class Quantizer:
             self.nb_speakers,
             model_config["dropout_p"],
             model_config["batch_norm"],
-        ).to("cuda")
+        ).to(device)
 
     def get_dataloaders(self):
         datasplits, dataloaders = get_dataloaders(
@@ -103,7 +103,7 @@ class Quantizer:
         return quantizer
 
     def autoencode(self, data_seq, speaker_id):
-        nn_input = torch.FloatTensor(self.data_scaler.transform(data_seq)).to("cuda")[
+        nn_input = torch.FloatTensor(self.data_scaler.transform(data_seq)).to(device)[
             None, :, :
         ]
         data_seq_len = len(data_seq)
@@ -111,7 +111,7 @@ class Quantizer:
             F.one_hot(torch.tensor(speaker_id), num_classes=self.nb_speakers)[None, :]
             .to(torch.float32)
             .repeat(data_seq_len, 1)
-            .to("cuda")[None, :, :]
+            .to(device)[None, :, :]
         )
         with torch.no_grad():
             seqs_pred, _, quantized_latent, quantized_index, encoder_output = self.nn(

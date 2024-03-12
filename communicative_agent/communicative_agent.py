@@ -36,6 +36,7 @@ class CommunicativeAgent(BaseAgent):
         self.nb_speakers = len(self.sound_quantizer.config["dataset"]["names"])
         self.sound_scaler = self.sound_quantizer.data_scaler
         self.datasplits = self.sound_quantizer.datasplits
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
         if load_nn:
             self._build_nn(self.config["model"])
             self.nn.eval()
@@ -68,7 +69,7 @@ class CommunicativeAgent(BaseAgent):
 
         self.nn = CommunicativeAgentNN(
             inverse_model, direct_model, self.sound_quantizer.nn
-        ).to("cuda")
+        ).to(self.device)
 
     def get_dataloaders(self):
         return self.sound_quantizer.get_dataloaders()
@@ -88,7 +89,7 @@ class CommunicativeAgent(BaseAgent):
         return optimizers
 
     def get_losses_fn(self):
-        art_scaler_var = torch.FloatTensor(self.synthesizer.art_scaler.var_).to("cuda")
+        art_scaler_var = torch.FloatTensor(self.synthesizer.art_scaler.var_).to(self.device)
 
         def inverse_model_loss(art_seqs_pred, sound_seqs_pred, sound_seqs, seqs_mask):
             reconstruction_error = (sound_seqs_pred - sound_seqs) ** 2
@@ -123,13 +124,13 @@ class CommunicativeAgent(BaseAgent):
         agent = CommunicativeAgent(config, load_nn=load_nn)
 
         if load_nn:
-            agent.nn.load_state_dict(torch.load(save_path + "/nn_weights.pt"))
+            agent.nn.load_state_dict(torch.load(save_path + "/nn_weights.pt", map_location=torch.device("cuda" if torch.cuda.is_available() else "cpu")))
             agent.nn.eval()
 
         return agent
 
     def repeat(self, sound_seq):
-        nn_input = torch.FloatTensor(self.sound_scaler.transform(sound_seq)).to("cuda")[
+        nn_input = torch.FloatTensor(self.sound_scaler.transform(sound_seq)).to(self.device)[
             None, :, :
         ]
         with torch.no_grad():

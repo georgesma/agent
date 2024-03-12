@@ -6,7 +6,7 @@ from hyperopt import tpe, hp, fmin
 from lib import utils
 from lib.nn.data_scaler import DataScaler
 from communicative_agent import CommunicativeAgent
-
+import torch
 from trainer import Trainer
 
 
@@ -16,6 +16,7 @@ def train_agent(agent, save_path):
         print("Already done")
         print()
         return
+    device= "cuda" if torch.cuda.is_available() else "cpu",
 
     dataloaders = agent.get_dataloaders()
     optimizers = agent.get_optimizers()
@@ -24,8 +25,8 @@ def train_agent(agent, save_path):
     sound_scalers = {
         "synthesizer": DataScaler.from_standard_scaler(
             agent.synthesizer.sound_scaler
-        ).to("cuda"),
-        "agent": DataScaler.from_standard_scaler(agent.sound_scaler).to("cuda"),
+        ).to(device),
+        "agent": DataScaler.from_standard_scaler(agent.sound_scaler).to(device),
     }
 
     trainer = Trainer(

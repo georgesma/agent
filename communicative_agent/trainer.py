@@ -21,9 +21,9 @@ class Trainer:
         synthesizer,
         sound_scalers,
         checkpoint_path,
-        device="cuda",
+        device= "cuda" if torch.cuda.is_available() else "cpu"
+,
     ):
-        self.nn = nn.to(device)
         self.optimizers = optimizers
         self.train_dataloader = train_dataloader
         self.validation_dataloader = validation_dataloader
@@ -35,6 +35,8 @@ class Trainer:
         self.sound_scalers = sound_scalers
         self.checkpoint_path = checkpoint_path
         self.device = device
+        self.nn = nn.to(self.device)
+
 
     def train(self):
         training_record = TrainingRecord()
@@ -81,9 +83,9 @@ class Trainer:
         with torch.no_grad() if not is_training else nullcontext():
             for batch in tqdm(dataloader, total=nb_batch, leave=False):
                 sound_seqs, speaker_seqs, seqs_len, seqs_mask = batch
-                sound_seqs = sound_seqs.to("cuda")
-                speaker_seqs = speaker_seqs.to("cuda")
-                seqs_mask = seqs_mask.to("cuda")
+                sound_seqs = sound_seqs.to(self.device)
+                speaker_seqs = speaker_seqs.to(self.device)
+                seqs_mask = seqs_mask.to(self.device)
 
                 with torch.no_grad():
                     _, _, sound_unit_seqs, _, _ = self.nn.sound_quantizer(
@@ -119,7 +121,7 @@ class Trainer:
         with torch.no_grad():
             art_seqs_estimated = self.nn.inverse_model(
                 sound_unit_seqs, seqs_len=seqs_len
-            )
+            ).to(self.device)
         sound_seqs_produced = self.synthesizer.synthesize_cuda(art_seqs_estimated)
         sound_seqs_produced = self.sound_scalers["synthesizer"].inverse_transform(
             sound_seqs_produced

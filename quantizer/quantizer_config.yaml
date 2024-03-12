@@ -18,5 +18,5 @@ dataset:
   shuffle_between_epochs: true
 training:
   learning_rate: 0.0004
-  max_epochs: 500
+  max_epochs: 50 #MA was using 500
   patience: 25

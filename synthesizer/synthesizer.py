@@ -8,6 +8,7 @@ from lib.art_sound_dataloader import get_dataloaders
 from lib.dataset_wrapper import Dataset
 from lib.nn.feedforward import FeedForward
 
+cpu_cuda_device = "cuda" if torch.cuda.is_available() else "cpu"
 
 class Synthesizer:
     def __init__(self, config, load_nn=True):
@@ -36,7 +37,7 @@ class Synthesizer:
             model_config["activation"],
             model_config["dropout_p"],
             model_config["batch_norm"],
-        ).to("cuda")
+        ).to(cpu_cuda_device)
 
     def get_dataloaders(self):
         datasplits, dataloaders = get_dataloaders(
@@ -92,7 +93,7 @@ class Synthesizer:
         return synthesizer
 
     def synthesize(self, art_seq):
-        nn_input = torch.FloatTensor(self.art_scaler.transform(art_seq)).to("cuda")
+        nn_input = torch.FloatTensor(self.art_scaler.transform(art_seq)).to(cpu_cuda_device)
         with torch.no_grad():
             nn_output = self.nn(nn_input).cpu().numpy()
         sound_seq_pred = self.sound_scaler.inverse_transform(nn_output)

@@ -1,8 +1,13 @@
 import torch
+import os, sys
 from tqdm import tqdm
+print("current path:", os.getcwd())
+# sys.path.insert(0, "/Users/ladislas/Desktop/motor_control_agent")
+sys.path.insert(0, "/mnt/c/Users/vpaul/Documents/Inner_Speech/agent/")
 
 from lib.early_stopping import EarlyStopping
 from lib.training_record import TrainingRecord, EpochMetrics
+
 
 
 class Trainer:
@@ -19,7 +24,7 @@ class Trainer:
         synthesizer,
         sound_scalers,
         checkpoint_path,
-        device="cuda",
+        device= "cuda" if torch.cuda.is_available() else "cpu" 
     ):
         self.nn = nn.to(device)
         self.optimizers = optimizers
@@ -72,8 +77,8 @@ class Trainer:
 
         for batch in tqdm(dataloader, total=nb_batch, leave=False):
             sound_seqs, seqs_len, seqs_mask = batch
-            sound_seqs = sound_seqs.to("cuda")
-            seqs_mask = seqs_mask.to("cuda")
+            sound_seqs = sound_seqs.to(self.device)
+            seqs_mask = seqs_mask.to(self.device)
 
             self.step_direct_model(
                 sound_seqs, seqs_len, seqs_mask, epoch_record, is_training=True
@@ -92,8 +97,8 @@ class Trainer:
         with torch.no_grad():
             for batch in tqdm(dataloader, total=nb_batch, leave=False):
                 sound_seqs, seqs_len, seqs_mask = batch
-                sound_seqs = sound_seqs.to("cuda")
-                seqs_mask = seqs_mask.to("cuda")
+                sound_seqs = sound_seqs.to(self.device)
+                seqs_mask = seqs_mask.to(self.device)
 
                 self.step_direct_model(
                     sound_seqs, seqs_len, seqs_mask, epoch_record, is_training=False

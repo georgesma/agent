@@ -18,7 +18,7 @@ class Trainer:
         max_epochs,
         patience,
         checkpoint_path,
-        device="cuda",
+        device= "cuda" if torch.cuda.is_available() else "cpu",
     ):
         self.nn = nn.to(device)
         self.optimizer = optimizer
@@ -70,9 +70,9 @@ class Trainer:
         self.nn.train()
         for batch in tqdm(dataloader, total=nb_batch, leave=False):
             data_seqs, speaker_seqs, seqs_len, seqs_mask = batch
-            data_seqs = data_seqs.to("cuda")
-            speaker_seqs = speaker_seqs.to("cuda")
-            seqs_mask = seqs_mask.to("cuda")
+            data_seqs = data_seqs.to(self.device)
+            speaker_seqs = speaker_seqs.to(self.device)
+            seqs_mask = seqs_mask.to(self.device)
 
             self.step_quantizer(
                 data_seqs, speaker_seqs, seqs_mask, epoch_record, is_training=True
@@ -88,9 +88,9 @@ class Trainer:
         with torch.no_grad():
             for batch in tqdm(dataloader, total=nb_batch, leave=False):
                 data_seqs, speaker_seqs, seqs_len, seqs_mask = batch
-                data_seqs = data_seqs.to("cuda")
-                speaker_seqs = speaker_seqs.to("cuda")
-                seqs_mask = seqs_mask.to("cuda")
+                data_seqs = data_seqs.to(self.device)
+                speaker_seqs = speaker_seqs.to(self.device)
+                seqs_mask = seqs_mask.to(self.device)
 
                 self.step_quantizer(
                     data_seqs, speaker_seqs, seqs_mask, epoch_record, is_training=False

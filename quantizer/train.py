@@ -1,12 +1,16 @@
-import os
+import os, sys
 import pickle
 import numpy as np
-
+print("current path:", os.getcwd())
+# sys.path.insert(0, "/Users/ladislas/Desktop/motor_control_agent")
+sys.path.insert(0, "/usr/users/deeplearningvse/deeplearningvse_20/Inner_Speech/agent")
 from lib import utils
 from quantizer import Quantizer
 from trainer import Trainer
 
 NB_TRAINING = 5
+
+
 
 def train_quantizer(quantizer, save_path):
     print("Training %s" % (save_path))

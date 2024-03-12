@@ -1,10 +1,14 @@
 from torch import nn
+import torch
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 class FeedForward(nn.Module):
     def __init__(self, x_dim, y_dim, hidden_dims, activation, dropout_p, batch_norm):
         super(FeedForward, self).__init__()
         self.build(x_dim, y_dim, hidden_dims, activation, dropout_p, batch_norm)
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
     def build(self, x_dim, y_dim, hidden_dims, activation, dropout_p, batch_norm):
         layers = []
@@ -33,6 +37,8 @@ class FeedForward(nn.Module):
         self.nn = nn.Sequential(*layers)
 
     def forward(self, x):
+        x = x.to(self.device)  # Ensure input is on the correct device
+
         original_shape = x.shape
         if len(original_shape) == 3:
             x = x.reshape(-1, original_shape[-1])

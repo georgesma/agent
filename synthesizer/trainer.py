@@ -4,6 +4,7 @@ from tqdm import tqdm
 from lib.early_stopping import EarlyStopping
 from lib.training_record import TrainingRecord, EpochMetrics
 
+cpu_cuda_device = "cpu" # "cpu" or "cuda"
 
 class Trainer:
     def __init__(
@@ -17,7 +18,7 @@ class Trainer:
         max_epochs,
         patience,
         checkpoint_path,
-        device="cuda",
+        device=cpu_cuda_device,
     ):
         self.nn = nn.to(device)
         self.optimizer = optimizer
@@ -67,9 +68,9 @@ class Trainer:
         self.nn.train()
         for batch in tqdm(dataloader, total=nb_batch, leave=False):
             art_seqs, sound_seqs, seqs_len, seqs_mask = batch
-            art_seqs = art_seqs.to("cuda")
-            sound_seqs = sound_seqs.to("cuda")
-            seqs_mask = seqs_mask.to("cuda")
+            art_seqs = art_seqs.to(cpu_cuda_device)
+            sound_seqs = sound_seqs.to(cpu_cuda_device)
+            seqs_mask = seqs_mask.to(cpu_cuda_device)
 
             self.optimizer.zero_grad()
             sound_seqs_pred = self.nn(art_seqs)
@@ -89,9 +90,9 @@ class Trainer:
         with torch.no_grad():
             for batch in tqdm(dataloader, total=nb_batch, leave=False):
                 art_seqs, sound_seqs, seqs_len, seqs_mask = batch
-                art_seqs = art_seqs.to("cuda")
-                sound_seqs = sound_seqs.to("cuda")
-                seqs_mask = seqs_mask.to("cuda")
+                art_seqs = art_seqs.to(cpu_cuda_device)
+                sound_seqs = sound_seqs.to(cpu_cuda_device)
+                seqs_mask = seqs_mask.to(cpu_cuda_device)
 
                 sound_seqs_pred = self.nn(art_seqs)
                 reconstruction_loss = self.loss_fn(

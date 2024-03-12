@@ -10,6 +10,10 @@ from lib import utils
 from lib import art_model
 from external import lpcynet
 
+print(lpcynet.__file__)
+print(dir(lpcynet))
+print(hasattr(lpcynet, 'analyze_frames'))
+
 INT16_MAX_VALUE = 32767
 
 

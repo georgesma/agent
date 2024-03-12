@@ -1,14 +1,17 @@
-import os
+import os, sys
 import pickle
+print("current path:", os.getcwd())
+# sys.path.insert(0, "/Users/ladislas/Desktop/motor_control_agent")
+sys.path.insert(0, "/mnt/c/Users/vpaul/Documents/Inner_Speech/agent/")
 
 from lib import utils
 from lib.nn.data_scaler import DataScaler
 from imitative_agent import ImitativeAgent
-
+import torch
 from trainer import Trainer
 
 NB_TRAINING = 5
-ART_MODALITY = "art_params"
+ART_MODALITY =  "ema"    #"art_params"
 # DATASETS_NAME = ["pb2007", "msak0", "fsew0"]
 DATASETS_NAME = ["pb2007"]
 JERK_LOSS_CEILS = [0.014]
@@ -16,6 +19,8 @@ JERK_LOSS_WEIGHTS = [1]
 
 
 def main():
+    device= 'cuda' if torch.cuda.is_available() else 'cpu'
+
     for i_training in range(NB_TRAINING):
         for dataset_name in DATASETS_NAME:
             for jerk_loss_ceil in JERK_LOSS_CEILS:
@@ -26,10 +31,10 @@ def main():
                     agent_config["dataset"]["names"] = [dataset_name]
                     agent_config["training"]["jerk_loss_ceil"] = jerk_loss_ceil
                     agent_config["training"]["jerk_loss_weight"] = jerk_loss_weight
-                    agent_config["synthesizer"]["name"] = (
-                        "dn=%s-hl=256,256,256,256-in=%s-out=cepstrum-0"
-                        % (dataset_name, ART_MODALITY)
-                    )
+                    agent_config["synthesizer"]["name"] =  "ea587b76c95fecef01cfd16c7f5f289d-1/"
+                        # "dn=%s-hl=256,256,256,256-in=%s-out=cepstrum-0"
+                        # % (dataset_name, ART_MODALITY)
+                    
 
                     agent = ImitativeAgent(agent_config)
                     signature = agent.get_signature()
@@ -48,9 +53,9 @@ def main():
                     sound_scalers = {
                         "synthesizer": DataScaler.from_standard_scaler(
                             agent.synthesizer.sound_scaler
-                        ).to("cuda"),
+                        ).to(device),
                         "agent": DataScaler.from_standard_scaler(agent.sound_scaler).to(
-                            "cuda"
+                            device
                         ),
                     }
 

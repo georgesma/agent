@@ -1,8 +1,11 @@
 import torch
 import pickle
 import yaml
-import os
+import os,sys
 from sklearn.preprocessing import StandardScaler
+print("current path:", os.getcwd())
+# sys.path.insert(0, "/Users/ladislas/Desktop/motor_control_agent")
+sys.path.insert(0, "/mnt/c/Users/vpaul/Documents/Inner_Speech/agent/")
 
 from lib.base_agent import BaseAgent
 from lib.sound_dataloader import get_dataloaders
@@ -21,10 +24,15 @@ class ImitativeAgent(BaseAgent):
         self.config = config
         self.sound_scaler = StandardScaler()
         self.datasplits = None
+        #self.device = "cuda" if torch.cuda.is_available() else "cpu"
+
         if load_nn:
+            print(self.config["model"])
+
             self.synthesizer = Synthesizer.reload(
                 "%s/%s" % (SYNTHESIZERS_PATH, config["synthesizer"]["name"])
             )
+            print(self.config["model"])
             self._build_nn(self.config["model"])
             self.nn.eval()
 
@@ -50,7 +58,7 @@ class ImitativeAgent(BaseAgent):
             model_config["direct_model"]["batch_norm"],
         )
 
-        self.nn = ImitativeAgentNN(inverse_model, direct_model).to("cuda")
+        self.nn = ImitativeAgentNN(inverse_model, direct_model)  #.to(self.device)
 
     def get_dataloaders(self):
         datasplits, dataloaders = get_dataloaders(
@@ -72,7 +80,7 @@ class ImitativeAgent(BaseAgent):
         }
 
     def get_losses_fn(self):
-        art_scaler_var = torch.FloatTensor(self.synthesizer.art_scaler.var_).to("cuda")
+        art_scaler_var = torch.FloatTensor(self.synthesizer.art_scaler.var_)  #.to(self.device)
 
         def inverse_model_loss(art_seqs_pred, sound_seqs_pred, sound_seqs, seqs_mask):
             reconstruction_error = (sound_seqs_pred - sound_seqs) ** 2
@@ -108,6 +116,7 @@ class ImitativeAgent(BaseAgent):
     def reload(save_path, load_nn=True):
         with open(save_path + "/config.yaml", "r") as f:
             config = yaml.safe_load(f)
+            print(config)
         agent = ImitativeAgent(config)
 
         with open(save_path + "/sound_scaler.pickle", "rb") as f:
@@ -121,7 +130,7 @@ class ImitativeAgent(BaseAgent):
         return agent
 
     def repeat(self, sound_seq):
-        nn_input = torch.FloatTensor(self.sound_scaler.transform(sound_seq)).to("cuda")
+        nn_input = torch.FloatTensor(self.sound_scaler.transform(sound_seq))  #.to(self.device)
         with torch.no_grad():
             sound_seq_estimated_unscaled, art_seq_estimated_unscaled = self.nn(
                 nn_input[None, :, :]

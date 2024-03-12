@@ -10,7 +10,7 @@ model:
     dropout_p: 0.25
     bidirectional: true
 synthesizer:
-  name: dn=pb2007-nd=2-hl=256,256,256,256-in=ema-out=cepstrum-0
+  name: ea587b76c95fecef01cfd16c7f5f289d-1    #dn=pb2007-nd=2-hl=256,256,256,256-in=ema-out=cepstrum-0
 dataset:
   names: [pb2007]
   sound_type: cepstrum

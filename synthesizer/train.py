@@ -1,5 +1,11 @@
 import os
 import pickle
+import os, sys
+import pickle
+
+print("current path:", os.getcwd())
+# sys.path.insert(0, "/Users/ladislas/Desktop/motor_control_agent")
+sys.path.insert(0, "/mnt/c/Users/vpaul/Documents/Inner_Speech/agent")
 
 from lib import utils
 from synthesizer import Synthesizer

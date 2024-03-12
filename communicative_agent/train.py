@@ -1,22 +1,28 @@
-import os
+import os, sys
 import pickle
+
+print("current path:", os.getcwd())
+# sys.path.insert(0, "/Users/ladislas/Desktop/motor_control_agent")
+sys.path.insert(0, "/usr/users/deeplearningvse/deeplearningvse_20/Inner_Speech/agent")
 
 from lib import utils
 from lib.nn.data_scaler import DataScaler
 from communicative_agent import CommunicativeAgent
 
 from trainer import Trainer
-
+import torch
 NB_TRAINING = 5
 # DATASETS_NAME = ["pb2007", "msak0", "fsew0"]
 DATASETS_NAME = ["pb2007"]
 FRAME_PADDING = [2]
-JERK_LOSS_WEIGHTS = [0, 0.15]
+JERK_LOSS_WEIGHTS = [0.1, 0.15] #MA : [0,0.15]
 NB_DERIVATIVES = [0]
 ART_TYPE = "art_params"
 
 
 def train_agent(agent, save_path):
+    device= "cuda" if torch.cuda.is_available() else "cpu"
+
     print("Training %s" % save_path)
     if os.path.isdir(save_path):
         print("Already done")
@@ -30,8 +36,8 @@ def train_agent(agent, save_path):
     sound_scalers = {
         "synthesizer": DataScaler.from_standard_scaler(
             agent.synthesizer.sound_scaler
-        ).to("cuda"),
-        "agent": DataScaler.from_standard_scaler(agent.sound_scaler).to("cuda"),
+        ).to(device),
+        "agent": DataScaler.from_standard_scaler(agent.sound_scaler).to(device),
     }
 
     trainer = Trainer(
