@@ -8,8 +8,9 @@ from communicative_agent import CommunicativeAgent
 from trainer import Trainer
 
 NB_FOLDS = 5
-DATASETS = [["pb2007"], ["gb2016", "th2016"]]
-JERK_LOSS_WEIGHTS = [0, 0.15]
+# DATASETS = [["pb2007"], ["gb2016", "th2016"]]
+DATASETS = [["pb2007"]]
+JERK_LOSS_WEIGHTS = [0, 0.05]
 
 
 def train_agent(agent, save_path):
