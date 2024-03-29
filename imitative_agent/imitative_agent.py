@@ -60,14 +60,18 @@ class ImitativeAgent(BaseAgent):
         return dataloaders
 
     def get_optimizers(self):
+        training_config = self.config["training"]
+        inverse_model_learning_rate = training_config["inverse_model_learning_rate"] if "inverse_model_learning_rate" in training_config else training_config["learning_rate"]
+        direct_model_learning_rate = training_config["direct_model_learning_rate"] if "direct_model_learning_rate" in training_config else training_config["learning_rate"]
+
         return {
             "inverse_model": torch.optim.Adam(
                 self.nn.inverse_model.parameters(),
-                lr=self.config["training"]["learning_rate"],
+                lr=inverse_model_learning_rate,
             ),
             "direct_model": torch.optim.Adam(
                 self.nn.direct_model.parameters(),
-                lr=self.config["training"]["learning_rate"],
+                lr=direct_model_learning_rate,
             ),
         }
 
